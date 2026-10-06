@@ -188,4 +188,15 @@ Route::middleware('auth')->group(function () {
 
     })->name('logout');
 
+    Route::get('/setup-admin', function() {
+    \App\Models\User::firstOrCreate(
+        ['email' => 'admin@smartwash.co.ke'],
+        [
+            'name' => 'System Admin', 
+            'password' => \Illuminate\Support\Facades\Hash::make('admin4321!')
+        ]
+    );
+    return 'Admin account created successfully!';
+});
+
 });
