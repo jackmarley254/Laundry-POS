@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Dashboard') | LaundryPOS</title>
+    <title>@yield('title', 'Dashboard') | SmartWash</title>
 
     {{-- Bootstrap --}}
     <link
@@ -981,11 +981,11 @@
 
             <div>
                 <div class="mobile-brand-name">
-                    LaundryPOS
+                    SMARTWASH
                 </div>
 
                 <div class="mobile-brand-subtitle">
-                    Laundry Management
+                    Laundry Management System
                 </div>
             </div>
 
@@ -1028,13 +1028,13 @@
                 <i class="bi bi-droplet-half"></i>
             </div>
 
-            <div class="brand-content">
-                <div class="brand-name">
-                    LaundryPOS
+            <div>
+                <div class="mobile-brand-name">
+                    SMARTWASH
                 </div>
 
-                <div class="brand-subtitle">
-                    Smart Laundry Management
+                <div class="mobile-brand-subtitle">
+                    Laundry Management System
                 </div>
             </div>
 
@@ -1122,8 +1122,7 @@
                         <i class="bi bi-cart3"></i>
 
                         <span class="sidebar-link-text">
-                            POS Terminal
-                        </span>
+                            Make New Order
 
                     </a>
 
@@ -1359,7 +1358,7 @@
                         <div>
 
                             <strong>
-                                LaundryPOS
+                                SMARTWASH
                             </strong>
 
                             <small>
@@ -1375,7 +1374,7 @@
 
                         <div>
                             © {{ date('Y') }}
-                            <strong>LaundryPOS</strong>.
+                            <strong>SMARTWASH</strong>.
                             All rights reserved.
                         </div>
 

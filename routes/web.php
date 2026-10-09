@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Http\Request;
@@ -6,25 +7,22 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\POSController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\OnlineCustomerController;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| SmartWash Web Routes
 |--------------------------------------------------------------------------
 |
-| SmartWash / LaundryPOS
-|
-| Route structure:
-| - Public landing page and online ordering
-| - Guest authentication
-| - Authenticated POS and administration
-| - Walk-in order management
-| - Online customer order management
-| - Reports
-| - Services
+| Public website and online ordering
+| Guest authentication
+| Combined dashboard
+| Walk-in POS order management
+| Online customer order management
+| Sales reports and services
 |
 |--------------------------------------------------------------------------
 */
@@ -34,105 +32,51 @@ use App\Http\Controllers\OnlineCustomerController;
 // PUBLIC ROUTES
 // ==========================================================================
 
-/*
-|--------------------------------------------------------------------------
-| Landing Page
-|--------------------------------------------------------------------------
-|
-| Loads the public SmartWash landing page and available services.
-|
-*/
-
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
-
-/*
-|--------------------------------------------------------------------------
-| Online Customer Order Submission
-|--------------------------------------------------------------------------
-|
-| Customers can submit an online laundry order without logging in.
-| Throttling provides basic protection against repeated submissions.
-|
-*/
-
+// Public online laundry order submission.
 Route::post('/online-order', [OnlineCustomerController::class, 'store'])
-    ->name('online-orders.store')
-    ->middleware('throttle:10,1');
+    ->middleware('throttle:10,1')
+    ->name('online-orders.store');
 
 
 // ==========================================================================
-// GUEST ROUTES
+// GUEST AUTHENTICATION
 // ==========================================================================
 
 Route::middleware('guest')->group(function () {
 
-    // ======================================================================
-    // LOGIN
-    // ======================================================================
-
-    /*
-    |--------------------------------------------------------------------------
-    | Login Page
-    |--------------------------------------------------------------------------
-    */
-
+    // Login page.
     Route::get('/login', function () {
         return view('auth.login');
     })->name('login');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Login Processing
-    |--------------------------------------------------------------------------
-    */
-
+    // Process login.
     Route::post('/login', function (Request $request) {
 
         $credentials = $request->validate([
             'email' => ['required', 'email'],
-            'password' => ['required'],
+            'password' => ['required', 'string'],
         ]);
 
         if (Auth::attempt(
             $credentials,
             $request->boolean('remember')
         )) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Prevent Session Fixation
-            |--------------------------------------------------------------------------
-            */
-
+            // Regenerate session ID after successful authentication.
             $request->session()->regenerate();
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | Redirect Authenticated User
-            |--------------------------------------------------------------------------
-            */
-
-            return redirect()->route('pos.dashboard');
+            return redirect()->intended(
+                route('pos.dashboard')
+            );
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Authentication Failed
-        |--------------------------------------------------------------------------
-        */
 
         return back()
             ->withErrors([
                 'email' => 'The email or password is incorrect.',
             ])
-            ->withInput(
-                $request->only('email')
-            );
+            ->onlyInput('email');
 
     })->name('login.process');
 
@@ -140,182 +84,85 @@ Route::middleware('guest')->group(function () {
 
 
 // ==========================================================================
-// AUTHENTICATED ROUTES
+// AUTHENTICATED APPLICATION
 // ==========================================================================
 
 Route::middleware('auth')->group(function () {
 
-    // ======================================================================
+    // ----------------------------------------------------------------------
     // SESSION KEEP-ALIVE
-    // ======================================================================
+    // ----------------------------------------------------------------------
 
     Route::get('/keep-alive', function (Request $request) {
-
         return response()->json([
             'success' => true,
             'message' => 'Session is active',
         ]);
-
     })->name('keep-alive');
 
 
-    // ======================================================================
-    // ADMIN DASHBOARD
-    // ======================================================================
+    // ----------------------------------------------------------------------
+    // MAIN DASHBOARD
+    // ----------------------------------------------------------------------
+    //
+    // DashboardController aggregates data from:
+    // 1. Walk-in POS orders (Order model)
+    // 2. Online customer orders (OnlineOrder model)
+    //
+    // Create app/Http/Controllers/DashboardController.php before using
+    // this route.
+    //
 
-    Route::get('/dashboard', [POSController::class, 'dashboard'])
+    Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('pos.dashboard');
 
 
-    // ======================================================================
-    // POS TERMINAL
-    // ======================================================================
+    // ----------------------------------------------------------------------
+    // WALK-IN POS TERMINAL
+    // ----------------------------------------------------------------------
 
     Route::get('/pos', [POSController::class, 'index'])
         ->name('pos.index');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Customer Search
-    |--------------------------------------------------------------------------
-    */
-
     Route::get('/search-customer', [POSController::class, 'searchCustomer'])
         ->name('pos.searchCustomer');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Store Walk-In POS Order
-    |--------------------------------------------------------------------------
-    */
-
     Route::post('/store-order', [POSController::class, 'storeOrder'])
         ->name('pos.store');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Receipt
-    |--------------------------------------------------------------------------
-    */
 
     Route::get('/receipt/{order}', [POSController::class, 'receipt'])
         ->name('pos.receipt');
 
 
-    // ======================================================================
+    // ----------------------------------------------------------------------
     // WALK-IN ORDER MANAGEMENT
-    // ======================================================================
-
-    /*
-    |--------------------------------------------------------------------------
-    | Orders List
-    |--------------------------------------------------------------------------
-    */
+    // ----------------------------------------------------------------------
 
     Route::get('/orders', [POSController::class, 'orderList'])
         ->name('orders.index');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Download Orders / Sales Report
-    |--------------------------------------------------------------------------
-    */
-
+    // Keep the download route before other order-specific routes.
     Route::get('/orders/download', [POSController::class, 'downloadReport'])
         ->name('orders.download');
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Walk-In Order Status
-    |--------------------------------------------------------------------------
-    |
-    | Uses PUT to remain compatible with the existing POSController method.
-    |
-    */
-
-    Route::put(
-        '/orders/{order}/status',
-        [POSController::class, 'updateStatus']
-    )->name('orders.updateStatus');
+    Route::put('/orders/{order}/status', [POSController::class, 'updateStatus'])
+        ->name('orders.updateStatus');
 
 
-    // ======================================================================
-    // ONLINE ORDERS
-    // ======================================================================
+    // ----------------------------------------------------------------------
+    // ONLINE CUSTOMER ORDER MANAGEMENT
+    // ----------------------------------------------------------------------
 
-    /*
-    |--------------------------------------------------------------------------
-    | Online Orders Dashboard
-    |--------------------------------------------------------------------------
-    |
-    | Displays orders submitted through the public online-order form.
-    |
-    */
+    Route::get('/online-orders', [OnlineCustomerController::class, 'index'])
+        ->name('online-orders.index');
 
-    Route::get(
-        '/online-orders',
-        [OnlineCustomerController::class, 'index']
-    )->name('online-orders.index');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Online Order Details
-    |--------------------------------------------------------------------------
-    |
-    | Displays the complete details of an individual online order.
-    |
-    */
-
-    Route::get(
-        '/online-orders/{order}',
-        [OnlineCustomerController::class, 'show']
-    )->name('online-orders.show');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Online Order Status
-    |--------------------------------------------------------------------------
-    |
-    | Updates the laundry/order processing status.
-    |
-    | Example statuses:
-    | - pending
-    | - processing
-    | - ready
-    | - completed
-    | - delivered
-    | - cancelled
-    |
-    */
+    Route::get('/online-orders/{order}', [OnlineCustomerController::class, 'show'])
+        ->name('online-orders.show');
 
     Route::patch(
         '/online-orders/{order}/status',
         [OnlineCustomerController::class, 'updateStatus']
     )->name('online-orders.update-status');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Online Order Payment Status
-    |--------------------------------------------------------------------------
-    |
-    | This route is used by the Payment Status dropdown on the Online Orders
-    | page.
-    |
-    | Payment values:
-    | - paid
-    | - not_paid
-    |
-    | The dropdown sends an AJAX PATCH request to this route.
-    |
-    */
 
     Route::patch(
         '/online-orders/{order}/payment-status',
@@ -323,15 +170,9 @@ Route::middleware('auth')->group(function () {
     )->name('online-orders.payment-status.update');
 
 
-    // ======================================================================
+    // ----------------------------------------------------------------------
     // SALES REPORTS
-    // ======================================================================
-
-    /*
-    |--------------------------------------------------------------------------
-    | Monthly Sales Report
-    |--------------------------------------------------------------------------
-    */
+    // ----------------------------------------------------------------------
 
     Route::get(
         '/reports/monthly-sales',
@@ -339,71 +180,27 @@ Route::middleware('auth')->group(function () {
     )->name('sales.monthly');
 
 
-    // ======================================================================
-    // SERVICES
-    // ======================================================================
+    // ----------------------------------------------------------------------
+    // LAUNDRY SERVICES
+    // ----------------------------------------------------------------------
 
-    /*
-    |--------------------------------------------------------------------------
-    | Laundry Services Management
-    |--------------------------------------------------------------------------
-    |
-    | Creates:
-    | - services.index
-    | - services.create
-    | - services.store
-    | - services.edit
-    | - services.update
-    | - services.destroy
-    |
-    | "show" is intentionally excluded.
-    |
-    */
-
-    Route::resource(
-        'services',
-        ServiceController::class
-    )->except(['show']);
+    Route::resource('services', ServiceController::class)
+        ->except(['show']);
 
 
-    // ======================================================================
+    // ----------------------------------------------------------------------
     // LOGOUT
-    // ======================================================================
+    // ----------------------------------------------------------------------
 
     Route::post('/logout', function (Request $request) {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Logout Current User
-        |--------------------------------------------------------------------------
-        */
-
         Auth::logout();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Destroy Authenticated Session
-        |--------------------------------------------------------------------------
-        */
-
+        // Invalidate the old session.
         $request->session()->invalidate();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Generate Fresh CSRF Token
-        |--------------------------------------------------------------------------
-        */
-
+        // Generate a new CSRF token.
         $request->session()->regenerateToken();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Return To Public Website
-        |--------------------------------------------------------------------------
-        */
 
         return redirect()->route('home');
 
