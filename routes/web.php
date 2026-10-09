@@ -234,12 +234,14 @@ Route::middleware('auth')->group(function () {
     | Update Walk-In Order Status
     |--------------------------------------------------------------------------
     |
-    | Uses PUT to remain compatible with your existing POSController method.
+    | Uses PUT to remain compatible with the existing POSController method.
     |
     */
 
-    Route::put('/orders/{order}/status', [POSController::class, 'updateStatus'])
-        ->name('orders.updateStatus');
+    Route::put(
+        '/orders/{order}/status',
+        [POSController::class, 'updateStatus']
+    )->name('orders.updateStatus');
 
 
     // ======================================================================
@@ -255,8 +257,10 @@ Route::middleware('auth')->group(function () {
     |
     */
 
-    Route::get('/online-orders', [OnlineCustomerController::class, 'index'])
-        ->name('online-orders.index');
+    Route::get(
+        '/online-orders',
+        [OnlineCustomerController::class, 'index']
+    )->name('online-orders.index');
 
 
     /*
@@ -268,8 +272,10 @@ Route::middleware('auth')->group(function () {
     |
     */
 
-    Route::get('/online-orders/{order}', [OnlineCustomerController::class, 'show'])
-        ->name('online-orders.show');
+    Route::get(
+        '/online-orders/{order}',
+        [OnlineCustomerController::class, 'show']
+    )->name('online-orders.show');
 
 
     /*
@@ -277,11 +283,15 @@ Route::middleware('auth')->group(function () {
     | Update Online Order Status
     |--------------------------------------------------------------------------
     |
-    | IMPORTANT:
-    | The route name is "online-orders.update-status" because this is the
-    | exact route name used by online-orders/show.blade.php.
+    | Updates the laundry/order processing status.
     |
-    | PATCH is used because the status is a partial update to the order.
+    | Example statuses:
+    | - pending
+    | - processing
+    | - ready
+    | - completed
+    | - delivered
+    | - cancelled
     |
     */
 
@@ -289,6 +299,28 @@ Route::middleware('auth')->group(function () {
         '/online-orders/{order}/status',
         [OnlineCustomerController::class, 'updateStatus']
     )->name('online-orders.update-status');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Update Online Order Payment Status
+    |--------------------------------------------------------------------------
+    |
+    | This route is used by the Payment Status dropdown on the Online Orders
+    | page.
+    |
+    | Payment values:
+    | - paid
+    | - not_paid
+    |
+    | The dropdown sends an AJAX PATCH request to this route.
+    |
+    */
+
+    Route::patch(
+        '/online-orders/{order}/payment-status',
+        [OnlineCustomerController::class, 'updatePaymentStatus']
+    )->name('online-orders.payment-status.update');
 
 
     // ======================================================================
@@ -301,8 +333,10 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/reports/monthly-sales', [ReportController::class, 'monthlySales'])
-        ->name('sales.monthly');
+    Route::get(
+        '/reports/monthly-sales',
+        [ReportController::class, 'monthlySales']
+    )->name('sales.monthly');
 
 
     // ======================================================================
@@ -326,8 +360,10 @@ Route::middleware('auth')->group(function () {
     |
     */
 
-    Route::resource('services', ServiceController::class)
-        ->except(['show']);
+    Route::resource(
+        'services',
+        ServiceController::class
+    )->except(['show']);
 
 
     // ======================================================================

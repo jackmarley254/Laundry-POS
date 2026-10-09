@@ -1,4 +1,3 @@
-
 @extends('components.layout')
 
 @section('title', 'Order Details')
@@ -6,113 +5,310 @@
 @push('styles')
 <style>
     :root {
-        --brand: #16a34a;
-        --brand-dark: #15803d;
-        --brand-light: #ecfdf3;
-        --ink: #0f172a;
-        --muted: #64748b;
-        --line: #eef1f5;
+        --od-navy: #071A33;
+        --od-navy-2: #0B2A4A;
+        --od-blue: #0D6EFD;
+        --od-blue-dark: #0B5ED7;
+        --od-blue-soft: #EAF3FF;
+        --od-blue-pale: #F5F9FF;
+
+        --od-ink: #122033;
+        --od-muted: #6B7A90;
+        --od-muted-2: #94A3B8;
+        --od-line: #E7EDF5;
+        --od-surface: #F5F8FC;
+        --od-white: #FFFFFF;
+
+        --od-success: #15803D;
+        --od-success-bg: #ECFDF3;
+        --od-warning: #B45309;
+        --od-warning-bg: #FFFBEB;
+        --od-danger: #B91C1C;
+        --od-danger-bg: #FEF2F2;
+        --od-purple: #6D28D9;
+        --od-purple-bg: #F5F3FF;
+
+        --od-radius: 18px;
+        --od-shadow: 0 8px 30px rgba(15, 23, 42, .055);
+        --od-shadow-hover: 0 14px 36px rgba(15, 23, 42, .09);
     }
 
     .od-page {
-        color: var(--ink);
+        color: var(--od-ink);
+        max-width: 1600px;
+        margin: 0 auto;
     }
 
     /* ============================================================
-       HEADER
+       HERO
     ============================================================ */
 
-    .od-header {
-        background: linear-gradient(
-            135deg,
-            #14532d 0%,
-            #16a34a 60%,
-            #22c55e 100%
-        );
-        border-radius: 20px;
-        padding: 28px 32px;
-        color: #fff;
+    .od-hero {
         position: relative;
         overflow: hidden;
-        box-shadow: 0 12px 30px -12px rgba(22, 163, 74, .45);
+        border-radius: 22px;
+        padding: 30px 32px;
+        color: #fff;
+        background:
+            radial-gradient(circle at 90% 0%, rgba(255,255,255,.15), transparent 30%),
+            linear-gradient(135deg, var(--od-navy) 0%, var(--od-navy-2) 48%, var(--od-blue) 100%);
+        box-shadow: 0 18px 42px rgba(7, 26, 51, .18);
     }
 
-    .od-header::before {
-        content: '';
+    .od-hero::before {
+        content: "";
         position: absolute;
-        width: 260px;
-        height: 260px;
+        width: 320px;
+        height: 320px;
         border-radius: 50%;
-        right: -90px;
-        top: -140px;
+        right: -130px;
+        top: -190px;
         background: rgba(255,255,255,.08);
     }
 
-    .od-header::after {
-        content: '';
+    .od-hero::after {
+        content: "";
         position: absolute;
         inset: 0;
         background:
-            radial-gradient(
-                circle at 85% -10%,
-                rgba(255,255,255,.18),
-                transparent 55%
-            );
+            linear-gradient(135deg, rgba(255,255,255,.04) 25%, transparent 25%) 0 0 / 32px 32px;
+        opacity: .35;
         pointer-events: none;
     }
 
-    .od-header-content {
+    .od-hero-content {
         position: relative;
         z-index: 2;
     }
 
-    .od-header h4 {
-        font-weight: 700;
-        letter-spacing: -.01em;
+    .od-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.10);
+        border: 1px solid rgba(255,255,255,.18);
+        color: rgba(255,255,255,.86);
+        font-size: .69rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        backdrop-filter: blur(10px);
     }
 
-    .od-header p {
+    .od-hero h1 {
+        margin: 13px 0 7px;
+        font-size: clamp(1.55rem, 2.5vw, 2.15rem);
+        font-weight: 800;
+        letter-spacing: -.035em;
+    }
+
+    .od-hero-description {
+        max-width: 720px;
+        margin: 0;
+        color: rgba(255,255,255,.72);
+        font-size: .88rem;
+        line-height: 1.65;
+    }
+
+    .od-hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 18px;
+    }
+
+    .od-meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        border-radius: 9px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.13);
         color: rgba(255,255,255,.8);
+        font-size: .72rem;
+        font-weight: 600;
+    }
+
+    .od-order-hero-card {
+        min-width: 235px;
+        padding: 18px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.10);
+        border: 1px solid rgba(255,255,255,.16);
+        backdrop-filter: blur(12px);
+    }
+
+    .od-order-hero-label {
+        color: rgba(255,255,255,.58);
+        font-size: .67rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .od-order-number {
+        margin-top: 4px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: -.015em;
+    }
+
+    .od-order-hero-amount {
+        margin-top: 12px;
+        font-size: .76rem;
+        color: rgba(255,255,255,.64);
+    }
+
+    .od-order-hero-amount strong {
+        display: block;
+        margin-top: 2px;
+        color: #fff;
+        font-size: 1.35rem;
     }
 
     .od-back-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
-        color: #fff;
-        border: 1px solid rgba(255,255,255,.28);
-        background: rgba(255,255,255,.10);
+        min-height: 42px;
         padding: .65rem 1rem;
-        border-radius: 10px;
+        border-radius: 11px;
+        color: #fff;
         text-decoration: none;
-        font-size: .85rem;
-        font-weight: 600;
-        transition: all .18s ease;
-        backdrop-filter: blur(8px);
+        background: rgba(255,255,255,.09);
+        border: 1px solid rgba(255,255,255,.20);
+        font-size: .78rem;
+        font-weight: 700;
+        transition: .2s ease;
+        backdrop-filter: blur(10px);
     }
 
     .od-back-btn:hover {
         color: #fff;
-        background: rgba(255,255,255,.18);
-        border-color: rgba(255,255,255,.45);
+        background: rgba(255,255,255,.17);
+        border-color: rgba(255,255,255,.35);
+        transform: translateY(-1px);
     }
 
     /* ============================================================
-       ORDER NUMBER BADGE
+       FLASH MESSAGES
     ============================================================ */
 
-    .order-number-badge {
+    .od-alert {
+        border-radius: 13px !important;
+        padding: 13px 15px;
+        font-size: .82rem;
+    }
+
+    /* ============================================================
+       STATUS CONTROL
+    ============================================================ */
+
+    .od-status-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 18px 20px;
+        border: 1px solid var(--od-line);
+        border-radius: var(--od-radius);
+        background: #fff;
+        box-shadow: var(--od-shadow);
+    }
+
+    .od-status-left {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .od-section-icon {
+        width: 43px;
+        height: 43px;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
+        flex: 0 0 43px;
+        border-radius: 12px;
+        font-size: 1rem;
+    }
+
+    .od-icon-blue {
+        background: var(--od-blue-soft);
+        color: var(--od-blue);
+    }
+
+    .od-icon-navy {
+        background: #E9F0F8;
+        color: var(--od-navy);
+    }
+
+    .od-icon-warning {
+        background: var(--od-warning-bg);
+        color: var(--od-warning);
+    }
+
+    .od-icon-purple {
+        background: var(--od-purple-bg);
+        color: var(--od-purple);
+    }
+
+    .od-status-label {
+        color: var(--od-muted);
+        font-size: .65rem;
+        font-weight: 800;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+    }
+
+    .od-status-current {
+        margin-top: 3px;
+        font-size: .96rem;
+        font-weight: 800;
+    }
+
+    .od-status-form {
+        display: flex;
+        align-items: center;
         gap: 8px;
-        padding: .45rem .85rem;
-        border-radius: 999px;
-        background: rgba(255,255,255,.14);
-        border: 1px solid rgba(255,255,255,.25);
-        color: #fff;
-        font-size: .76rem;
+    }
+
+    .od-status-form .form-select {
+        min-width: 165px;
+        height: 42px;
+        border-color: var(--od-line);
+        border-radius: 10px;
+        font-size: .78rem;
         font-weight: 700;
-        letter-spacing: .02em;
+        color: var(--od-ink);
+    }
+
+    .od-status-form .form-select:focus {
+        border-color: var(--od-blue);
+        box-shadow: 0 0 0 .2rem rgba(13,110,253,.10);
+    }
+
+    .od-btn-primary {
+        min-height: 42px;
+        border: 0;
+        border-radius: 10px;
+        padding: .6rem 1rem;
+        background: linear-gradient(135deg, var(--od-blue), var(--od-blue-dark));
+        color: #fff;
+        font-size: .78rem;
+        font-weight: 750;
+        box-shadow: 0 7px 16px rgba(13,110,253,.18);
+        transition: .18s ease;
+    }
+
+    .od-btn-primary:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(13,110,253,.25);
     }
 
     /* ============================================================
@@ -120,442 +316,552 @@
     ============================================================ */
 
     .od-card {
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        background: #fff;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(15,23,42,.025);
+        border: 1px solid var(--od-line);
+        border-radius: var(--od-radius);
+        background: #fff;
+        box-shadow: var(--od-shadow);
+        transition: box-shadow .2s ease, transform .2s ease;
+    }
+
+    .od-card:hover {
+        box-shadow: var(--od-shadow-hover);
     }
 
     .od-card-header {
         padding: 18px 20px;
-        border-bottom: 1px solid var(--line);
-        background: #fff;
-    }
-
-    .od-card-header h6 {
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .od-card-header p {
-        margin: 3px 0 0;
-        color: var(--muted);
-        font-size: .78rem;
+        border-bottom: 1px solid var(--od-line);
+        background: linear-gradient(180deg, #fff 0%, #FCFDFF 100%);
     }
 
     .od-card-body {
         padding: 20px;
     }
 
-    /* ============================================================
-       SECTION ICONS
-    ============================================================ */
+    .od-card-title {
+        margin: 0;
+        color: var(--od-ink);
+        font-size: .88rem;
+        font-weight: 800;
+        letter-spacing: -.01em;
+    }
 
-    .section-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 11px;
+    .od-card-subtitle {
+        margin: 3px 0 0;
+        color: var(--od-muted);
+        font-size: .72rem;
+        line-height: 1.5;
+    }
+
+    .od-card-count {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        font-size: 1rem;
-    }
-
-    .section-icon.green {
-        background: var(--brand-light);
-        color: var(--brand-dark);
-    }
-
-    .section-icon.blue {
-        background: #eff6ff;
-        color: #1d4ed8;
-    }
-
-    .section-icon.orange {
-        background: #fff7ed;
-        color: #c2410c;
-    }
-
-    .section-icon.purple {
-        background: #f5f3ff;
-        color: #6d28d9;
-    }
-
-    /* ============================================================
-       STATUS PANEL
-    ============================================================ */
-
-    .status-panel {
-        border: 1px solid var(--line);
-        border-radius: 16px;
-        background: #fff;
-        padding: 18px 20px;
-        box-shadow: 0 2px 8px rgba(15,23,42,.025);
-    }
-
-    .status-label {
-        font-size: .7rem;
-        text-transform: uppercase;
-        letter-spacing: .05em;
-        color: var(--muted);
-        font-weight: 700;
-    }
-
-    .status-current {
-        font-size: 1rem;
-        font-weight: 700;
-        margin-top: 3px;
-    }
-
-    .status-form .form-select {
-        min-width: 155px;
-        border-radius: 10px;
-        border-color: var(--line);
-        font-size: .84rem;
-        font-weight: 600;
-    }
-
-    .status-form .form-select:focus {
-        border-color: var(--brand);
-        box-shadow: 0 0 0 .2rem rgba(22,163,74,.12);
-    }
-
-    .btn-brand {
-        border: 1px solid var(--brand);
-        background: var(--brand);
-        color: #fff;
-        font-weight: 600;
-        border-radius: 10px;
-        padding: .58rem 1rem;
-        font-size: .82rem;
-        transition: all .15s ease;
-    }
-
-    .btn-brand:hover {
-        background: var(--brand-dark);
-        border-color: var(--brand-dark);
-        color: #fff;
-    }
-
-    /* ============================================================
-       INFORMATION ROWS
-    ============================================================ */
-
-    .info-item {
-        padding: 13px 0;
-        border-bottom: 1px solid var(--line);
-    }
-
-    .info-item:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .info-label {
+        padding: 6px 9px;
+        border-radius: 8px;
+        background: var(--od-blue-soft);
+        color: var(--od-blue-dark);
         font-size: .68rem;
-        text-transform: uppercase;
-        letter-spacing: .045em;
-        color: #94a3b8;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-
-    .info-value {
-        font-size: .9rem;
-        color: var(--ink);
-        font-weight: 600;
-    }
-
-    .info-value.muted {
-        color: var(--muted);
-        font-weight: 500;
-    }
-
-    .phone-link {
-        color: var(--brand-dark);
-        text-decoration: none;
-    }
-
-    .phone-link:hover {
-        color: var(--brand);
-        text-decoration: underline;
+        font-weight: 800;
     }
 
     /* ============================================================
-       AVATAR
+       CUSTOMER
     ============================================================ */
 
-    .customer-avatar {
-        width: 54px;
-        height: 54px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #16a34a, #22c55e);
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 800;
+    .od-customer-profile {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--od-line);
+    }
+
+    .od-customer-avatar {
+        width: 55px;
+        height: 55px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 16px -8px rgba(22,163,74,.55);
-        flex-shrink: 0;
+        flex: 0 0 55px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, var(--od-navy), var(--od-blue));
+        color: #fff;
+        font-size: .98rem;
+        font-weight: 850;
+        box-shadow: 0 9px 20px rgba(13,110,253,.20);
+    }
+
+    .od-customer-name {
+        font-size: .94rem;
+        font-weight: 800;
+    }
+
+    .od-customer-type {
+        margin-top: 2px;
+        color: var(--od-muted);
+        font-size: .72rem;
     }
 
     /* ============================================================
-       TABLE
+       INFO GRID
     ============================================================ */
+
+    .od-info-item {
+        min-height: 74px;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--od-line);
+    }
+
+    .od-info-item.no-border {
+        border-bottom: 0;
+    }
+
+    .od-info-label {
+        margin-bottom: 5px;
+        color: var(--od-muted-2);
+        font-size: .64rem;
+        font-weight: 800;
+        letter-spacing: .065em;
+        text-transform: uppercase;
+    }
+
+    .od-info-value {
+        color: var(--od-ink);
+        font-size: .83rem;
+        font-weight: 700;
+        line-height: 1.55;
+    }
+
+    .od-info-value.muted {
+        color: var(--od-muted);
+        font-weight: 550;
+    }
+
+    .od-contact-link {
+        color: var(--od-blue-dark);
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .od-contact-link:hover {
+        color: var(--od-blue);
+        text-decoration: underline;
+    }
+
+    .od-location {
+        color: var(--od-ink);
+    }
+
+    /* ============================================================
+       SERVICE TABLE
+    ============================================================ */
+
+    .od-table-wrap {
+        overflow-x: auto;
+    }
 
     .od-table {
         margin: 0;
+        min-width: 650px;
     }
 
     .od-table thead th {
-        background: #f8fafc;
-        border-bottom: 1px solid var(--line);
-        font-size: .7rem;
+        padding: .8rem .85rem;
+        border-bottom: 1px solid var(--od-line);
+        background: #F7F9FC;
+        color: var(--od-muted);
+        font-size: .63rem;
+        font-weight: 800;
+        letter-spacing: .065em;
         text-transform: uppercase;
-        letter-spacing: .04em;
-        color: var(--muted);
-        font-weight: 700;
-        padding: .85rem .85rem;
         white-space: nowrap;
     }
 
     .od-table tbody td {
         padding: .95rem .85rem;
+        border-bottom: 1px solid var(--od-line);
         vertical-align: middle;
-        border-bottom: 1px solid var(--line);
     }
 
     .od-table tbody tr:last-child td {
-        border-bottom: none;
+        border-bottom: 0;
+    }
+
+    .od-table tbody tr {
+        transition: background .15s ease;
     }
 
     .od-table tbody tr:hover {
-        background: #f8fdf9;
+        background: #F8FBFF;
     }
 
-    .service-name {
-        font-weight: 700;
-        color: var(--ink);
-        font-size: .86rem;
+    .od-service-icon {
+        width: 37px;
+        height: 37px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--od-blue-soft);
+        color: var(--od-blue);
+        flex-shrink: 0;
     }
 
-    .service-code {
-        font-size: .72rem;
-        color: var(--muted);
+    .od-service-name {
+        color: var(--od-ink);
+        font-size: .81rem;
+        font-weight: 800;
+    }
+
+    .od-service-code {
         margin-top: 2px;
+        color: var(--od-muted);
+        font-size: .65rem;
     }
 
-    .amount-tag {
+    .od-unit-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: #F1F5F9;
+        color: #475569;
+        font-size: .65rem;
         font-weight: 700;
-        color: var(--ink);
+    }
+
+    .od-quantity {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        padding: 5px 8px;
+        border-radius: 7px;
+        background: var(--od-blue-pale);
+        color: var(--od-blue-dark);
+        font-size: .72rem;
+        font-weight: 800;
+    }
+
+    .od-price {
+        color: var(--od-muted);
+        font-size: .75rem;
+        font-weight: 600;
+    }
+
+    .od-subtotal {
+        color: var(--od-ink);
+        font-size: .78rem;
+        font-weight: 850;
     }
 
     /* ============================================================
-       PILLS
+       STATUS PILLS
     ============================================================ */
 
-    .pill {
+    .od-pill {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        padding: .32rem .7rem;
+        padding: 6px 9px;
         border-radius: 999px;
-        font-size: .72rem;
-        font-weight: 700;
-        letter-spacing: .01em;
         border: 1px solid transparent;
+        font-size: .65rem;
+        font-weight: 800;
         white-space: nowrap;
     }
 
-    .pill-pending {
-        background: #fffbeb;
-        color: #b45309;
-        border-color: #fde68a;
+    .od-pill-pending {
+        background: var(--od-warning-bg);
+        border-color: #FDE68A;
+        color: var(--od-warning);
     }
 
-    .pill-processing {
-        background: #eff6ff;
-        color: #1d4ed8;
-        border-color: #bfdbfe;
+    .od-pill-processing {
+        background: var(--od-blue-soft);
+        border-color: #BFDBFE;
+        color: #1D4ED8;
     }
 
-    .pill-ready {
-        background: #eef2ff;
-        color: #4338ca;
-        border-color: #c7d2fe;
+    .od-pill-ready {
+        background: #EEF2FF;
+        border-color: #C7D2FE;
+        color: #4338CA;
     }
 
-    .pill-completed,
-    .pill-delivered,
-    .pill-paid {
-        background: #ecfdf3;
-        color: #15803d;
-        border-color: #bbf7d0;
+    .od-pill-completed,
+    .od-pill-delivered,
+    .od-pill-paid {
+        background: var(--od-success-bg);
+        border-color: #BBF7D0;
+        color: var(--od-success);
     }
 
-    .pill-cancelled,
-    .pill-failed {
-        background: #fef2f2;
-        color: #b91c1c;
-        border-color: #fecaca;
+    .od-pill-cancelled,
+    .od-pill-failed {
+        background: var(--od-danger-bg);
+        border-color: #FECACA;
+        color: var(--od-danger);
     }
 
     /* ============================================================
        TOTAL
     ============================================================ */
 
-    .total-box {
-        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
-        border: 1px solid #bbf7d0;
-        border-radius: 13px;
-        padding: 16px;
+    .od-total-box {
+        padding: 18px;
+        border: 1px solid #CFE0FA;
+        border-radius: 14px;
+        background:
+            radial-gradient(circle at 100% 0%, rgba(13,110,253,.08), transparent 40%),
+            linear-gradient(135deg, #F5F9FF, #EEF6FF);
     }
 
-    .total-label {
-        color: var(--muted);
-        font-size: .76rem;
-        font-weight: 600;
+    .od-total-label {
+        color: var(--od-muted);
+        font-size: .68rem;
+        font-weight: 750;
     }
 
-    .total-value {
-        color: var(--brand-dark);
+    .od-total-description {
+        margin-top: 2px;
+        color: var(--od-muted);
+        font-size: .68rem;
+    }
+
+    .od-total-value {
+        color: var(--od-blue-dark);
         font-size: 1.45rem;
-        font-weight: 800;
-        letter-spacing: -.02em;
-    }
-
-    /* ============================================================
-       TIMELINE
-    ============================================================ */
-
-    .timeline {
-        position: relative;
-        padding-left: 8px;
-    }
-
-    .timeline-item {
-        position: relative;
-        display: flex;
-        gap: 13px;
-        padding-bottom: 22px;
-    }
-
-    .timeline-item:last-child {
-        padding-bottom: 0;
-    }
-
-    .timeline-item:not(:last-child)::before {
-        content: '';
-        position: absolute;
-        left: 6px;
-        top: 16px;
-        bottom: 0;
-        width: 1px;
-        background: #e2e8f0;
-    }
-
-    .timeline-dot {
-        width: 13px;
-        height: 13px;
-        border-radius: 50%;
-        background: var(--brand);
-        border: 3px solid #dcfce7;
-        position: relative;
-        z-index: 2;
-        flex-shrink: 0;
-        margin-top: 2px;
-    }
-
-    .timeline-dot.muted {
-        background: #94a3b8;
-        border-color: #f1f5f9;
-    }
-
-    .timeline-title {
-        font-size: .82rem;
-        font-weight: 700;
-        color: var(--ink);
-    }
-
-    .timeline-date {
-        color: var(--muted);
-        font-size: .72rem;
-        margin-top: 2px;
+        font-weight: 900;
+        letter-spacing: -.035em;
+        white-space: nowrap;
     }
 
     /* ============================================================
        NOTES
     ============================================================ */
 
-    .notes-box {
-        background: #f8fafc;
-        border: 1px solid var(--line);
+    .od-notes {
+        padding: 15px;
+        border: 1px solid var(--od-line);
         border-radius: 12px;
-        padding: 14px 15px;
+        background: #F8FAFC;
         color: #475569;
-        font-size: .84rem;
-        line-height: 1.65;
+        font-size: .8rem;
+        line-height: 1.7;
+    }
+
+    /* ============================================================
+       TIMELINE
+    ============================================================ */
+
+    .od-timeline {
+        position: relative;
+    }
+
+    .od-timeline-item {
+        position: relative;
+        display: flex;
+        gap: 13px;
+        padding-bottom: 23px;
+    }
+
+    .od-timeline-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .od-timeline-item:not(:last-child)::before {
+        content: "";
+        position: absolute;
+        left: 6px;
+        top: 17px;
+        bottom: 0;
+        width: 1px;
+        background: #DCE5F0;
+    }
+
+    .od-timeline-dot {
+        position: relative;
+        z-index: 2;
+        width: 13px;
+        height: 13px;
+        margin-top: 2px;
+        border-radius: 50%;
+        flex: 0 0 13px;
+        background: var(--od-blue);
+        border: 3px solid #DDEBFF;
+    }
+
+    .od-timeline-dot.muted {
+        background: #94A3B8;
+        border-color: #EDF2F7;
+    }
+
+    .od-timeline-title {
+        color: var(--od-ink);
+        font-size: .78rem;
+        font-weight: 800;
+    }
+
+    .od-timeline-date {
+        margin-top: 2px;
+        color: var(--od-muted);
+        font-size: .67rem;
     }
 
     /* ============================================================
        QUICK ACTIONS
     ============================================================ */
 
-    .quick-action {
+    .od-quick-action {
         display: flex;
         align-items: center;
         gap: 11px;
-        padding: 11px 12px;
-        border: 1px solid var(--line);
+        padding: 12px;
+        border: 1px solid var(--od-line);
         border-radius: 11px;
+        background: #fff;
+        color: var(--od-ink);
         text-decoration: none;
-        color: var(--ink);
-        transition: all .15s ease;
+        transition: .18s ease;
     }
 
-    .quick-action:hover {
-        border-color: #bbf7d0;
-        background: #f8fdf9;
-        color: var(--brand-dark);
+    .od-quick-action:hover {
+        color: var(--od-blue-dark);
+        border-color: #BDD6FA;
+        background: var(--od-blue-pale);
+        transform: translateX(2px);
     }
 
-    .quick-action i {
-        color: var(--brand);
-        font-size: 1rem;
+    .od-quick-action-icon {
+        width: 33px;
+        height: 33px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        background: var(--od-blue-soft);
+        color: var(--od-blue);
+        flex-shrink: 0;
     }
 
-    .quick-action span {
-        font-size: .8rem;
-        font-weight: 600;
+    .od-quick-action span {
+        font-size: .74rem;
+        font-weight: 750;
+    }
+
+    /* ============================================================
+       PAYMENT STATUS
+    ============================================================ */
+
+    .od-payment-card {
+        padding: 14px;
+        border: 1px solid var(--od-line);
+        border-radius: 13px;
+        background: #FBFDFF;
+    }
+
+    .od-payment-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .od-payment-label {
+        color: var(--od-muted);
+        font-size: .65rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    /* ============================================================
+       EMPTY SERVICES
+    ============================================================ */
+
+    .od-empty {
+        padding: 50px 20px;
+        text-align: center;
+        color: var(--od-muted);
+    }
+
+    .od-empty-icon {
+        width: 52px;
+        height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: var(--od-blue-soft);
+        color: var(--od-blue);
+        font-size: 1.3rem;
     }
 
     /* ============================================================
        RESPONSIVE
     ============================================================ */
 
+    @media (max-width: 1199.98px) {
+        .od-order-hero-card {
+            min-width: 200px;
+        }
+    }
+
     @media (max-width: 767.98px) {
-        .od-header {
+        .od-hero {
             padding: 22px 20px;
-            border-radius: 16px;
+            border-radius: 17px;
         }
 
+        .od-hero h1 {
+            font-size: 1.55rem;
+        }
+
+        .od-order-hero-card {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .od-status-panel {
+            align-items: stretch;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .od-status-form {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .od-status-form .form-select,
+        .od-status-form .od-btn-primary {
+            width: 100%;
+        }
+
+        .od-card-header,
         .od-card-body {
             padding: 16px;
         }
 
-        .od-card-header {
-            padding: 16px;
+        .od-total-value {
+            font-size: 1.15rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .od-hero-meta {
+            display: grid;
+            grid-template-columns: 1fr;
         }
 
-        .status-form {
+        .od-back-btn {
             width: 100%;
         }
 
-        .status-form .form-select {
-            flex: 1;
+        .od-customer-profile {
+            align-items: flex-start;
         }
     }
 </style>
@@ -581,57 +887,103 @@
     $initials = collect(
         preg_split('/\s+/', trim($order->customer_name ?? ''))
     )
-    ->map(fn($name) => strtoupper(substr($name, 0, 1)))
-    ->take(2)
-    ->implode('');
+        ->filter()
+        ->map(fn ($name) => strtoupper(substr($name, 0, 1)))
+        ->take(2)
+        ->implode('');
 
     $statusLabel = ucfirst($status);
+
+    $items = $order->items ?? [];
+    $itemCount = count($items);
+
+    $quantity = $order->quantity ?? 0;
+    $quantityDisplay = rtrim(
+        rtrim((string) $quantity, '0'),
+        '.'
+    );
+
+    if ($quantityDisplay === '') {
+        $quantityDisplay = '0';
+    }
+
+    $totalAmount = (float) ($order->total_amount ?? 0);
+
+    $whatsappNumber = preg_replace('/\D/', '', $order->phone ?? '');
 @endphp
 
 <div class="container-fluid px-0 od-page">
 
     {{-- ============================================================
-         HEADER
+         HERO HEADER
     ============================================================ --}}
-    <div class="od-header mb-4">
+    <div class="od-hero mb-4">
+        <div class="od-hero-content">
 
-        <div class="od-header-content">
+            <div class="d-flex flex-column flex-xl-row justify-content-between gap-4">
 
-            <div class="d-flex flex-wrap justify-content-between align-items-start gap-4">
+                <div class="flex-grow-1">
 
-                <div>
-                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <div class="od-eyebrow">
+                        <i class="bi bi-grid-1x2-fill"></i>
+                        Online Order Management
+                    </div>
 
-                        <span class="order-number-badge">
-                            <i class="bi bi-bag-check"></i>
+                    <h1>Order Details</h1>
+
+                    <p class="od-hero-description">
+                        Review customer information, manage order progress,
+                        monitor services, pickup scheduling, payment status
+                        and fulfillment details from one place.
+                    </p>
+
+                    <div class="od-hero-meta">
+                        <span class="od-meta-chip">
+                            <i class="bi bi-shield-check"></i>
+                            Order Control
+                        </span>
+
+                        <span class="od-meta-chip">
+                            <i class="bi bi-clock-history"></i>
+                            Live Order Record
+                        </span>
+
+                        <span class="od-meta-chip">
+                            <i class="bi bi-wallet2"></i>
+                            KSh {{ number_format($totalAmount, 2) }}
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="d-flex flex-column align-items-stretch gap-2">
+
+                    <a href="{{ route('online-orders.index') }}"
+                       class="od-back-btn">
+                        <i class="bi bi-arrow-left"></i>
+                        Back to Orders
+                    </a>
+
+                    <div class="od-order-hero-card">
+
+                        <div class="od-order-hero-label">
+                            Order Reference
+                        </div>
+
+                        <div class="od-order-number">
                             #{{ $order->order_number }}
-                        </span>
+                        </div>
 
-                        <span class="pill pill-{{ $status }}">
-                            <i class="bi {{ $statusIcon }}"></i>
-                            {{ $statusLabel }}
-                        </span>
+                        <div class="od-order-hero-amount">
+                            Total Order Value
+                            <strong>
+                                KSh {{ number_format($totalAmount, 2) }}
+                            </strong>
+                        </div>
 
                     </div>
 
-                    <h4 class="mb-1">
-                        Order Details
-                    </h4>
-
-                    <p class="mb-0">
-                        Review customer information, services, pickup details,
-                        payment and order status.
-                    </p>
                 </div>
-
-                <a href="{{ route('online-orders.index') }}"
-                   class="od-back-btn">
-
-                    <i class="bi bi-arrow-left"></i>
-
-                    Back to Orders
-
-                </a>
 
             </div>
 
@@ -643,103 +995,100 @@
          FLASH MESSAGES
     ============================================================ --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3 border-0 shadow-sm"
+        <div class="alert alert-success alert-dismissible fade show od-alert border-0 shadow-sm mb-4"
              role="alert">
-
-            <i class="bi bi-check-circle me-2"></i>
-
+            <i class="bi bi-check-circle-fill me-2"></i>
             {{ session('success') }}
 
             <button type="button"
                     class="btn-close"
-                    data-bs-dismiss="alert">
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
             </button>
-
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 shadow-sm"
+        <div class="alert alert-danger alert-dismissible fade show od-alert border-0 shadow-sm mb-4"
              role="alert">
-
-            <i class="bi bi-exclamation-triangle me-2"></i>
-
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
             {{ session('error') }}
 
             <button type="button"
                     class="btn-close"
-                    data-bs-dismiss="alert">
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
             </button>
-
         </div>
     @endif
 
 
     {{-- ============================================================
-         STATUS UPDATE
+         STATUS MANAGEMENT
     ============================================================ --}}
-    <div class="status-panel mb-4">
+    <div class="od-status-panel mb-4">
 
-        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="od-status-left">
 
-            <div class="d-flex align-items-center gap-3">
-
-                <div class="section-icon green">
-                    <i class="bi {{ $statusIcon }}"></i>
-                </div>
-
-                <div>
-                    <div class="status-label">
-                        Current Order Status
-                    </div>
-
-                    <div class="status-current">
-                        {{ $statusLabel }}
-                    </div>
-                </div>
-
+            <div class="od-section-icon od-icon-blue">
+                <i class="bi {{ $statusIcon }}"></i>
             </div>
 
-            <form method="POST"
-                  action="{{ route('online-orders.update-status', $order) }}"
-                  class="status-form d-flex flex-column flex-sm-row gap-2">
+            <div>
+                <div class="od-status-label">
+                    Current Order Status
+                </div>
 
-                @csrf
-                @method('PATCH')
+                <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+                    <div class="od-status-current">
+                        {{ $statusLabel }}
+                    </div>
 
-                <select name="status"
-                        class="form-select">
-
-                    @foreach([
-                        'pending'    => 'Pending',
-                        'processing' => 'Processing',
-                        'ready'      => 'Ready',
-                        'completed'  => 'Completed',
-                        'delivered'  => 'Delivered',
-                        'cancelled'  => 'Cancelled',
-                    ] as $value => $label)
-
-                        <option value="{{ $value }}"
-                            {{ $status === $value ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-                <button type="submit"
-                        class="btn btn-brand">
-
-                    <i class="bi bi-check2 me-1"></i>
-
-                    Update Status
-
-                </button>
-
-            </form>
+                    <span class="od-pill od-pill-{{ $status }}">
+                        <i class="bi {{ $statusIcon }}"></i>
+                        {{ $statusLabel }}
+                    </span>
+                </div>
+            </div>
 
         </div>
+
+        <form method="POST"
+              action="{{ route('online-orders.update-status', $order) }}"
+              class="od-status-form">
+
+            @csrf
+            @method('PATCH')
+
+            <select name="status"
+                    class="form-select"
+                    aria-label="Order status">
+
+                @foreach([
+                    'pending'    => 'Pending',
+                    'processing' => 'Processing',
+                    'ready'      => 'Ready',
+                    'completed'  => 'Completed',
+                    'delivered'  => 'Delivered',
+                    'cancelled'  => 'Cancelled',
+                ] as $value => $label)
+
+                    <option value="{{ $value }}"
+                        {{ $status === $value ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+
+                @endforeach
+
+            </select>
+
+            <button type="submit"
+                    class="od-btn-primary">
+                <i class="bi bi-check2-circle me-1"></i>
+                Update Status
+            </button>
+
+        </form>
 
     </div>
 
@@ -754,24 +1103,25 @@
         ========================================================= --}}
         <div class="col-xl-8">
 
-
-            {{-- CUSTOMER INFORMATION --}}
+            {{-- ====================================================
+                 CUSTOMER INFORMATION
+            ===================================================== --}}
             <div class="od-card mb-4">
 
                 <div class="od-card-header">
 
                     <div class="d-flex align-items-center gap-3">
 
-                        <div class="section-icon green">
-                            <i class="bi bi-person"></i>
+                        <div class="od-section-icon od-icon-blue">
+                            <i class="bi bi-person-vcard"></i>
                         </div>
 
                         <div>
-                            <h6>
+                            <h6 class="od-card-title">
                                 Customer Information
                             </h6>
 
-                            <p>
+                            <p class="od-card-subtitle">
                                 Customer contact and delivery information
                             </p>
                         </div>
@@ -780,55 +1130,56 @@
 
                 </div>
 
-
                 <div class="od-card-body">
 
-                    <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="od-customer-profile">
 
-                        <div class="customer-avatar">
-                            {{ $initials ?: '—' }}
+                        <div class="od-customer-avatar">
+                            {{ $initials ?: 'CU' }}
                         </div>
 
                         <div>
-
-                            <div class="fw-bold fs-6">
-                                {{ $order->customer_name }}
+                            <div class="od-customer-name">
+                                {{ $order->customer_name ?: 'Unnamed Customer' }}
                             </div>
 
-                            <div class="small text-muted">
+                            <div class="od-customer-type">
+                                <i class="bi bi-globe2 me-1"></i>
                                 Online Customer
                             </div>
-
                         </div>
 
                     </div>
 
-
                     <div class="row g-4">
 
+                        {{-- Phone --}}
                         <div class="col-md-6">
 
-                            <div class="info-item">
+                            <div class="od-info-item">
 
-                                <div class="info-label">
+                                <div class="od-info-label">
                                     Phone Number
                                 </div>
 
-                                <div class="info-value">
+                                <div class="od-info-value">
 
                                     @if($order->phone)
+
                                         <a href="tel:{{ $order->phone }}"
-                                           class="phone-link">
+                                           class="od-contact-link">
 
-                                            <i class="bi bi-telephone me-1"></i>
-
+                                            <i class="bi bi-telephone-fill me-1"></i>
                                             {{ $order->phone }}
 
                                         </a>
+
                                     @else
-                                        <span class="muted">
+
+                                        <span class="text-muted fw-normal">
                                             Not provided
                                         </span>
+
                                     @endif
 
                                 </div>
@@ -837,24 +1188,23 @@
 
                         </div>
 
-
+                        {{-- Email --}}
                         <div class="col-md-6">
 
-                            <div class="info-item">
+                            <div class="od-info-item">
 
-                                <div class="info-label">
+                                <div class="od-info-label">
                                     Email Address
                                 </div>
 
-                                <div class="info-value">
+                                <div class="od-info-value">
 
                                     @if($order->email)
 
                                         <a href="mailto:{{ $order->email }}"
-                                           class="phone-link">
+                                           class="od-contact-link">
 
-                                            <i class="bi bi-envelope me-1"></i>
-
+                                            <i class="bi bi-envelope-fill me-1"></i>
                                             {{ $order->email }}
 
                                         </a>
@@ -873,18 +1223,18 @@
 
                         </div>
 
-
+                        {{-- Address --}}
                         <div class="col-12">
 
-                            <div class="info-item">
+                            <div class="od-info-item no-border">
 
-                                <div class="info-label">
+                                <div class="od-info-label">
                                     Delivery Address
                                 </div>
 
-                                <div class="info-value">
+                                <div class="od-info-value od-location">
 
-                                    <i class="bi bi-geo-alt text-success me-1"></i>
+                                    <i class="bi bi-geo-alt-fill text-primary me-1"></i>
 
                                     {{ $order->delivery_address ?: 'Not provided' }}
 
@@ -901,7 +1251,9 @@
             </div>
 
 
-            {{-- ORDER SERVICES --}}
+            {{-- ====================================================
+                 ORDER SERVICES
+            ===================================================== --}}
             <div class="od-card mb-4">
 
                 <div class="od-card-header">
@@ -910,25 +1262,25 @@
 
                         <div class="d-flex align-items-center gap-3">
 
-                            <div class="section-icon blue">
-                                <i class="bi bi-basket2"></i>
+                            <div class="od-section-icon od-icon-blue">
+                                <i class="bi bi-basket2-fill"></i>
                             </div>
 
                             <div>
-                                <h6>
+                                <h6 class="od-card-title">
                                     Order Services
                                 </h6>
 
-                                <p>
+                                <p class="od-card-subtitle">
                                     Services included in this order
                                 </p>
                             </div>
 
                         </div>
 
-                        <span class="small text-muted">
-                            {{ count($order->items ?? []) }}
-                            {{ Str::plural('item', count($order->items ?? [])) }}
+                        <span class="od-card-count">
+                            {{ $itemCount }}
+                            {{ $itemCount === 1 ? 'Item' : 'Items' }}
                         </span>
 
                     </div>
@@ -936,7 +1288,7 @@
                 </div>
 
 
-                <div class="table-responsive">
+                <div class="od-table-wrap">
 
                     <table class="table od-table align-middle">
 
@@ -953,7 +1305,7 @@
                                 </th>
 
                                 <th class="text-center">
-                                    Qty
+                                    Quantity
                                 </th>
 
                                 <th class="text-end">
@@ -968,61 +1320,70 @@
 
                         </thead>
 
-
                         <tbody>
 
-                            @forelse(($order->items ?? []) as $item)
+                            @forelse($items as $item)
 
                                 <tr>
 
                                     <td class="ps-4">
 
-                                        <div class="service-name">
-                                            {{ $item['name'] ?? 'Service' }}
-                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
 
-                                        @if(isset($item['service_id']))
-                                            <div class="service-code">
-                                                Service #{{ $item['service_id'] }}
+                                            <div class="od-service-icon">
+                                                <i class="bi bi-droplet-half"></i>
                                             </div>
-                                        @endif
+
+                                            <div>
+
+                                                <div class="od-service-name">
+                                                    {{ $item['name'] ?? 'Service' }}
+                                                </div>
+
+                                                @if(isset($item['service_id']))
+
+                                                    <div class="od-service-code">
+                                                        Service #{{ $item['service_id'] }}
+                                                    </div>
+
+                                                @endif
+
+                                            </div>
+
+                                        </div>
 
                                     </td>
 
-
                                     <td>
 
-                                        <span class="small text-muted">
+                                        <span class="od-unit-badge">
                                             {{ $item['unit'] ?? 'Unit' }}
                                         </span>
 
                                     </td>
 
-
                                     <td class="text-center">
 
-                                        <span class="fw-semibold">
+                                        <span class="od-quantity">
                                             {{ $item['quantity'] ?? 1 }}
                                         </span>
 
                                     </td>
 
-
                                     <td class="text-end">
 
-                                        <span class="small">
+                                        <span class="od-price">
                                             KSh
-                                            {{ number_format((float)($item['price'] ?? 0), 2) }}
+                                            {{ number_format((float) ($item['price'] ?? 0), 2) }}
                                         </span>
 
                                     </td>
 
-
                                     <td class="text-end pe-4">
 
-                                        <span class="amount-tag">
+                                        <span class="od-subtotal">
                                             KSh
-                                            {{ number_format((float)($item['subtotal'] ?? 0), 2) }}
+                                            {{ number_format((float) ($item['subtotal'] ?? 0), 2) }}
                                         </span>
 
                                     </td>
@@ -1033,13 +1394,22 @@
 
                                 <tr>
 
-                                    <td colspan="5"
-                                        class="text-center py-5">
+                                    <td colspan="5">
 
-                                        <i class="bi bi-bag-x fs-2 text-muted"></i>
+                                        <div class="od-empty">
 
-                                        <div class="fw-semibold mt-2">
-                                            No individual service items found
+                                            <div class="od-empty-icon">
+                                                <i class="bi bi-bag-x"></i>
+                                            </div>
+
+                                            <div class="fw-bold mt-3">
+                                                No individual service items
+                                            </div>
+
+                                            <div class="small mt-1">
+                                                This order does not contain detailed service line items.
+                                            </div>
+
                                         </div>
 
                                     </td>
@@ -1057,24 +1427,24 @@
 
                 <div class="p-3 p-md-4 border-top">
 
-                    <div class="total-box">
+                    <div class="od-total-box">
 
-                        <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
 
                             <div>
 
-                                <div class="total-label">
+                                <div class="od-total-label">
                                     Order Total
                                 </div>
 
-                                <div class="small text-muted">
-                                    Including all selected services
+                                <div class="od-total-description">
+                                    Total value of all selected services
                                 </div>
 
                             </div>
 
-                            <div class="total-value">
-                                KSh {{ number_format((float)$order->total_amount, 2) }}
+                            <div class="od-total-value">
+                                KSh {{ number_format($totalAmount, 2) }}
                             </div>
 
                         </div>
@@ -1086,7 +1456,9 @@
             </div>
 
 
-            {{-- CUSTOMER NOTES --}}
+            {{-- ====================================================
+                 CUSTOMER NOTES
+            ===================================================== --}}
             @if($order->notes)
 
                 <div class="od-card mb-4">
@@ -1095,18 +1467,20 @@
 
                         <div class="d-flex align-items-center gap-3">
 
-                            <div class="section-icon orange">
-                                <i class="bi bi-chat-left-text"></i>
+                            <div class="od-section-icon od-icon-warning">
+                                <i class="bi bi-chat-left-text-fill"></i>
                             </div>
 
                             <div>
-                                <h6>
+
+                                <h6 class="od-card-title">
                                     Customer Notes
                                 </h6>
 
-                                <p>
+                                <p class="od-card-subtitle">
                                     Additional instructions from the customer
                                 </p>
+
                             </div>
 
                         </div>
@@ -1115,7 +1489,7 @@
 
                     <div class="od-card-body">
 
-                        <div class="notes-box">
+                        <div class="od-notes">
                             {{ $order->notes }}
                         </div>
 
@@ -1124,7 +1498,6 @@
                 </div>
 
             @endif
-
 
         </div>
 
@@ -1135,99 +1508,102 @@
         <div class="col-xl-4">
 
 
-            {{-- ORDER SUMMARY --}}
+            {{-- ====================================================
+                 ORDER SUMMARY
+            ===================================================== --}}
             <div class="od-card mb-4">
 
                 <div class="od-card-header">
 
                     <div class="d-flex align-items-center gap-3">
 
-                        <div class="section-icon green">
-                            <i class="bi bi-receipt"></i>
+                        <div class="od-section-icon od-icon-navy">
+                            <i class="bi bi-receipt-cutoff"></i>
                         </div>
 
                         <div>
-                            <h6>
+
+                            <h6 class="od-card-title">
                                 Order Summary
                             </h6>
 
-                            <p>
+                            <p class="od-card-subtitle">
                                 Key order information
                             </p>
+
                         </div>
 
                     </div>
 
                 </div>
 
-
                 <div class="od-card-body">
 
-                    <div class="info-item">
+                    <div class="od-info-item">
 
-                        <div class="info-label">
+                        <div class="od-info-label">
                             Order Number
                         </div>
 
-                        <div class="info-value">
+                        <div class="od-info-value">
                             #{{ $order->order_number }}
                         </div>
 
                     </div>
 
 
-                    <div class="info-item">
+                    <div class="od-info-item">
 
-                        <div class="info-label">
-                            Service
+                        <div class="od-info-label">
+                            Services
                         </div>
 
-                        <div class="info-value muted">
-                            {{ $order->service_name }}
+                        <div class="od-info-value muted">
+                            {{ $order->service_name ?: 'Multiple Services' }}
                         </div>
 
                     </div>
 
 
-                    <div class="info-item">
+                    <div class="od-info-item">
 
-                        <div class="info-label">
+                        <div class="od-info-label">
                             Total Quantity
                         </div>
 
-                        <div class="info-value">
-                            {{ rtrim(rtrim((string)$order->quantity, '0'), '.') }}
+                        <div class="od-info-value">
+                            {{ $quantityDisplay }}
                         </div>
 
                     </div>
 
 
-                    <div class="info-item">
+                    <div class="od-info-item">
 
-                        <div class="info-label">
+                        <div class="od-info-label">
                             Payment Status
                         </div>
 
-                        <div class="info-value">
+                        <div class="od-info-value">
 
-                            @if($paymentStatus === 'paid' || $paymentStatus === 'completed')
+                            @if(in_array($paymentStatus, ['paid', 'completed']))
 
-                                <span class="pill pill-paid">
-                                    <i class="bi bi-check-circle"></i>
+                                <span class="od-pill od-pill-paid">
+                                    <i class="bi bi-check-circle-fill"></i>
                                     Paid
                                 </span>
 
                             @elseif($paymentStatus === 'failed')
 
-                                <span class="pill pill-failed">
-                                    <i class="bi bi-x-circle"></i>
+                                <span class="od-pill od-pill-failed">
+                                    <i class="bi bi-x-circle-fill"></i>
                                     Failed
                                 </span>
 
                             @else
 
-                                <span class="pill pill-pending">
-                                    <i class="bi bi-clock"></i>
+                                <span class="od-pill od-pill-pending">
+                                    <i class="bi bi-clock-fill"></i>
                                     Pending
                                 </span>
 
@@ -1240,14 +1616,43 @@
 
                     <div class="mt-4">
 
-                        <div class="total-box">
+                        <div class="od-payment-card">
 
-                            <div class="total-label">
+                            <div class="od-payment-status">
+
+                                <div>
+
+                                    <div class="od-payment-label">
+                                        Payment Overview
+                                    </div>
+
+                                    <div class="fw-bold mt-1">
+                                        {{ in_array($paymentStatus, ['paid', 'completed']) ? 'Payment received' : 'Payment pending' }}
+                                    </div>
+
+                                </div>
+
+                                <div class="od-section-icon od-icon-blue">
+                                    <i class="bi bi-credit-card-2-front"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-3">
+
+                        <div class="od-total-box">
+
+                            <div class="od-total-label">
                                 Total Amount
                             </div>
 
-                            <div class="total-value">
-                                KSh {{ number_format((float)$order->total_amount, 2) }}
+                            <div class="od-total-value">
+                                KSh {{ number_format($totalAmount, 2) }}
                             </div>
 
                         </div>
@@ -1259,41 +1664,44 @@
             </div>
 
 
-            {{-- PICKUP / DELIVERY --}}
+            {{-- ====================================================
+                 PICKUP & DELIVERY
+            ===================================================== --}}
             <div class="od-card mb-4">
 
                 <div class="od-card-header">
 
                     <div class="d-flex align-items-center gap-3">
 
-                        <div class="section-icon blue">
-                            <i class="bi bi-calendar-event"></i>
+                        <div class="od-section-icon od-icon-blue">
+                            <i class="bi bi-calendar2-check-fill"></i>
                         </div>
 
                         <div>
-                            <h6>
+
+                            <h6 class="od-card-title">
                                 Pickup & Delivery
                             </h6>
 
-                            <p>
+                            <p class="od-card-subtitle">
                                 Customer's requested schedule
                             </p>
+
                         </div>
 
                     </div>
 
                 </div>
 
-
                 <div class="od-card-body">
 
-                    <div class="info-item">
+                    <div class="od-info-item">
 
-                        <div class="info-label">
+                        <div class="od-info-label">
                             Pickup Date
                         </div>
 
-                        <div class="info-value">
+                        <div class="od-info-value">
 
                             @if($order->pickup_date)
 
@@ -1302,7 +1710,11 @@
                                 {{ \Carbon\Carbon::parse($order->pickup_date)->format('D, d M Y') }}
 
                             @else
-                                Not specified
+
+                                <span class="text-muted fw-normal">
+                                    Not specified
+                                </span>
+
                             @endif
 
                         </div>
@@ -1310,13 +1722,13 @@
                     </div>
 
 
-                    <div class="info-item">
+                    <div class="od-info-item">
 
-                        <div class="info-label">
+                        <div class="od-info-label">
                             Pickup Time
                         </div>
 
-                        <div class="info-value">
+                        <div class="od-info-value">
 
                             @if($order->pickup_time)
 
@@ -1325,7 +1737,11 @@
                                 {{ \Carbon\Carbon::parse($order->pickup_time)->format('g:i A') }}
 
                             @else
-                                Not specified
+
+                                <span class="text-muted fw-normal">
+                                    Not specified
+                                </span>
+
                             @endif
 
                         </div>
@@ -1333,15 +1749,15 @@
                     </div>
 
 
-                    <div class="info-item">
+                    <div class="od-info-item no-border">
 
-                        <div class="info-label">
+                        <div class="od-info-label">
                             Delivery Address
                         </div>
 
-                        <div class="info-value muted">
+                        <div class="od-info-value muted">
 
-                            <i class="bi bi-geo-alt text-danger me-1"></i>
+                            <i class="bi bi-geo-alt-fill text-primary me-1"></i>
 
                             {{ $order->delivery_address ?: 'Not provided' }}
 
@@ -1354,48 +1770,51 @@
             </div>
 
 
-            {{-- TIMELINE --}}
+            {{-- ====================================================
+                 TIMELINE
+            ===================================================== --}}
             <div class="od-card mb-4">
 
                 <div class="od-card-header">
 
                     <div class="d-flex align-items-center gap-3">
 
-                        <div class="section-icon purple">
+                        <div class="od-section-icon od-icon-purple">
                             <i class="bi bi-clock-history"></i>
                         </div>
 
                         <div>
-                            <h6>
+
+                            <h6 class="od-card-title">
                                 Order Timeline
                             </h6>
 
-                            <p>
-                                Order activity
+                            <p class="od-card-subtitle">
+                                Order activity and progression
                             </p>
+
                         </div>
 
                     </div>
 
                 </div>
 
-
                 <div class="od-card-body">
 
-                    <div class="timeline">
+                    <div class="od-timeline">
 
-                        <div class="timeline-item">
+                        <div class="od-timeline-item">
 
-                            <div class="timeline-dot"></div>
+                            <div class="od-timeline-dot"></div>
 
                             <div>
 
-                                <div class="timeline-title">
+                                <div class="od-timeline-title">
                                     Order Created
                                 </div>
 
-                                <div class="timeline-date">
-                                    {{ $order->created_at?->format('d M Y, h:i A') }}
+                                <div class="od-timeline-date">
+                                    {{ $order->created_at?->format('d M Y, h:i A') ?? 'Not available' }}
                                 </div>
 
                             </div>
@@ -1403,17 +1822,17 @@
                         </div>
 
 
-                        <div class="timeline-item">
+                        <div class="od-timeline-item">
 
-                            <div class="timeline-dot {{ $status === 'pending' ? 'muted' : '' }}"></div>
+                            <div class="od-timeline-dot {{ $status === 'pending' ? 'muted' : '' }}"></div>
 
                             <div>
 
-                                <div class="timeline-title">
+                                <div class="od-timeline-title">
                                     Current Status
                                 </div>
 
-                                <div class="timeline-date">
+                                <div class="od-timeline-date">
                                     {{ $statusLabel }}
                                 </div>
 
@@ -1422,18 +1841,18 @@
                         </div>
 
 
-                        <div class="timeline-item">
+                        <div class="od-timeline-item">
 
-                            <div class="timeline-dot muted"></div>
+                            <div class="od-timeline-dot muted"></div>
 
                             <div>
 
-                                <div class="timeline-title">
+                                <div class="od-timeline-title">
                                     Last Updated
                                 </div>
 
-                                <div class="timeline-date">
-                                    {{ $order->updated_at?->format('d M Y, h:i A') }}
+                                <div class="od-timeline-date">
+                                    {{ $order->updated_at?->format('d M Y, h:i A') ?? 'Not available' }}
                                 </div>
 
                             </div>
@@ -1447,59 +1866,75 @@
             </div>
 
 
-            {{-- QUICK ACTIONS --}}
+            {{-- ====================================================
+                 QUICK ACTIONS
+            ===================================================== --}}
             <div class="od-card mb-4">
 
                 <div class="od-card-header">
 
                     <div class="d-flex align-items-center gap-3">
 
-                        <div class="section-icon orange">
-                            <i class="bi bi-lightning-charge"></i>
+                        <div class="od-section-icon od-icon-blue">
+                            <i class="bi bi-lightning-charge-fill"></i>
                         </div>
 
                         <div>
-                            <h6>
+
+                            <h6 class="od-card-title">
                                 Quick Actions
                             </h6>
 
-                            <p>
-                                Customer communication
+                            <p class="od-card-subtitle">
+                                Customer communication shortcuts
                             </p>
+
                         </div>
 
                     </div>
 
                 </div>
 
-
                 <div class="od-card-body d-grid gap-2">
 
                     @if($order->phone)
 
                         <a href="tel:{{ $order->phone }}"
-                           class="quick-action">
+                           class="od-quick-action">
 
-                            <i class="bi bi-telephone"></i>
+                            <span class="od-quick-action-icon">
+                                <i class="bi bi-telephone-fill"></i>
+                            </span>
 
                             <span>
                                 Call Customer
                             </span>
 
-                        </a>
-
-                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $order->phone) }}"
-                           target="_blank"
-                           rel="noopener"
-                           class="quick-action">
-
-                            <i class="bi bi-whatsapp"></i>
-
-                            <span>
-                                WhatsApp Customer
-                            </span>
+                            <i class="bi bi-chevron-right ms-auto text-muted"></i>
 
                         </a>
+
+
+                        @if($whatsappNumber)
+
+                            <a href="https://wa.me/{{ $whatsappNumber }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="od-quick-action">
+
+                                <span class="od-quick-action-icon">
+                                    <i class="bi bi-whatsapp"></i>
+                                </span>
+
+                                <span>
+                                    WhatsApp Customer
+                                </span>
+
+                                <i class="bi bi-box-arrow-up-right ms-auto text-muted"></i>
+
+                            </a>
+
+                        @endif
 
                     @endif
 
@@ -1507,13 +1942,17 @@
                     @if($order->email)
 
                         <a href="mailto:{{ $order->email }}"
-                           class="quick-action">
+                           class="od-quick-action">
 
-                            <i class="bi bi-envelope"></i>
+                            <span class="od-quick-action-icon">
+                                <i class="bi bi-envelope-fill"></i>
+                            </span>
 
                             <span>
                                 Email Customer
                             </span>
+
+                            <i class="bi bi-chevron-right ms-auto text-muted"></i>
 
                         </a>
 
@@ -1521,20 +1960,23 @@
 
 
                     <a href="{{ route('online-orders.index') }}"
-                       class="quick-action">
+                       class="od-quick-action">
 
-                        <i class="bi bi-list-ul"></i>
+                        <span class="od-quick-action-icon">
+                            <i class="bi bi-list-ul"></i>
+                        </span>
 
                         <span>
                             View All Online Orders
                         </span>
+
+                        <i class="bi bi-chevron-right ms-auto text-muted"></i>
 
                     </a>
 
                 </div>
 
             </div>
-
 
         </div>
 
@@ -1543,4 +1985,3 @@
 </div>
 
 @endsection
-

@@ -1,418 +1,1765 @@
 <x-layout>
+
     @section('title', 'Dashboard Overview')
 
     @section('content')
-        <!-- Modern Dashboard Styles -->
+
         <style>
-            body {
-                background-color: #f0f2f5;
+            /* ================================================================
+               SMARTWASH PREMIUM BLUE & WHITE DASHBOARD
+            ================================================================ */
+
+            :root {
+                --sw-primary: #0d6efd;
+                --sw-primary-dark: #084298;
+                --sw-primary-deep: #062b68;
+                --sw-primary-light: #eaf3ff;
+                --sw-blue-soft: #f4f8ff;
+
+                --sw-white: #ffffff;
+                --sw-surface: #ffffff;
+                --sw-body: #f5f8fc;
+
+                --sw-text: #10233f;
+                --sw-muted: #6b7a90;
+                --sw-border: #e5ebf3;
+
+                --sw-success: #16a34a;
+                --sw-warning: #f59e0b;
+                --sw-danger: #dc3545;
+
+                --sw-shadow: 0 8px 30px rgba(16, 35, 63, 0.06);
+                --sw-shadow-hover: 0 18px 45px rgba(13, 110, 253, 0.13);
+
+                --sw-radius: 18px;
             }
 
+
+            /* ================================================================
+               PAGE
+            ================================================================ */
+
+            .smartwash-dashboard {
+                background:
+                    radial-gradient(
+                        circle at top right,
+                        rgba(13, 110, 253, 0.055),
+                        transparent 30%
+                    ),
+                    var(--sw-body);
+
+                min-height: 100vh;
+                color: var(--sw-text);
+                padding-bottom: 0;
+            }
+
+
+            /* ================================================================
+               TOP ACTION BAR
+            ================================================================ */
+
+            .top-action-bar {
+                background: rgba(255, 255, 255, 0.96);
+                border: 1px solid rgba(13, 110, 253, 0.08);
+                border-radius: var(--sw-radius);
+                padding: 14px;
+                margin-bottom: 24px;
+
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+
+                box-shadow: var(--sw-shadow);
+
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+
+            .top-action-bar .btn {
+                flex: 1 1 auto;
+                min-height: 46px;
+
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 7px;
+
+                border-radius: 11px;
+
+                font-size: 0.86rem;
+                font-weight: 700;
+
+                padding: 10px 16px;
+
+                transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease,
+                    background 0.2s ease;
+            }
+
+            .top-action-bar .btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .top-action-bar .btn-primary {
+                background: linear-gradient(
+                    135deg,
+                    var(--sw-primary),
+                    var(--sw-primary-dark)
+                );
+
+                border-color: var(--sw-primary);
+
+                box-shadow:
+                    0 8px 20px rgba(13, 110, 253, 0.22);
+            }
+
+            .top-action-bar .btn-outline-primary {
+                color: var(--sw-primary);
+                border-color: rgba(13, 110, 253, 0.28);
+                background: var(--sw-primary-light);
+            }
+
+            .top-action-bar .btn-outline-primary:hover {
+                background: var(--sw-primary);
+                color: #fff;
+            }
+
+            .top-action-bar .btn-outline-warning {
+                color: #9a6700;
+                border-color: rgba(245, 158, 11, 0.25);
+                background: #fffaf0;
+            }
+
+            .top-action-bar .btn-outline-warning:hover {
+                color: #fff;
+                background: #f59e0b;
+                border-color: #f59e0b;
+            }
+
+            .top-action-bar .btn-outline-success {
+                color: #15803d;
+                border-color: rgba(22, 163, 74, 0.22);
+                background: #f0fdf4;
+            }
+
+            .top-action-bar .btn-outline-success:hover {
+                color: #fff;
+                background: #16a34a;
+                border-color: #16a34a;
+            }
+
+            .top-action-bar .btn-outline-info {
+                color: #075985;
+                border-color: rgba(14, 165, 233, 0.22);
+                background: #f0f9ff;
+            }
+
+            .top-action-bar .btn-outline-info:hover {
+                color: #fff;
+                background: #0284c7;
+                border-color: #0284c7;
+            }
+
+
+            /* ================================================================
+               STAT CARDS
+            ================================================================ */
+
             .modern-card {
-                border: none;
-                border-radius: 1rem;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                border: 0;
+                border-radius: var(--sw-radius);
                 overflow: hidden;
                 position: relative;
+
+                box-shadow: var(--sw-shadow);
+
+                transition:
+                    transform 0.25s ease,
+                    box-shadow 0.25s ease;
             }
 
             .modern-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                box-shadow: var(--sw-shadow-hover);
             }
 
-            /* Decorative background circle for cards */
+            .stat-card {
+                min-height: 155px;
+                isolation: isolate;
+            }
+
             .stat-card::before {
                 content: "";
+
                 position: absolute;
-                top: -20%;
-                right: -20%;
-                width: 150px;
-                height: 150px;
+
+                width: 190px;
+                height: 190px;
+
+                right: -70px;
+                top: -85px;
+
                 border-radius: 50%;
-                background: rgba(255, 255, 255, 0.15);
-                z-index: 0;
+
+                background: rgba(255, 255, 255, 0.09);
+
+                z-index: -1;
+            }
+
+            .stat-card::after {
+                content: "";
+
+                position: absolute;
+
+                width: 100px;
+                height: 100px;
+
+                right: 45px;
+                bottom: -70px;
+
+                border-radius: 50%;
+
+                background: rgba(255, 255, 255, 0.05);
+
+                z-index: -1;
+            }
+
+
+            /* ================================================================
+               BLUE STAT VARIANTS
+            ================================================================ */
+
+            .bg-gradient-primary,
+            .bg-gradient-success,
+            .bg-gradient-warning,
+            .bg-gradient-info {
+                color: #fff !important;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #0d6efd 0%,
+                        #084298 100%
+                    ) !important;
+            }
+
+            .stat-card:nth-child(2) .bg-gradient-success {
+                background:
+                    linear-gradient(
+                        135deg,
+                        #1261c9 0%,
+                        #0a3f8f 100%
+                    ) !important;
+            }
+
+            .stat-card:nth-child(3) .bg-gradient-warning {
+                background:
+                    linear-gradient(
+                        135deg,
+                        #1976e8 0%,
+                        #0750ad 100%
+                    ) !important;
+            }
+
+            .stat-card:nth-child(4) .bg-gradient-info {
+                background:
+                    linear-gradient(
+                        135deg,
+                        #2196f3 0%,
+                        #0b5fc2 100%
+                    ) !important;
             }
 
             .stat-icon {
-                width: 60px;
-                height: 60px;
+                width: 62px;
+                height: 62px;
+
+                flex-shrink: 0;
+
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(5px);
+
+                border-radius: 17px;
+
+                background: rgba(255, 255, 255, 0.15);
+
+                border: 1px solid rgba(255, 255, 255, 0.18);
+
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                    0 8px 20px rgba(0, 0, 0, 0.08);
+
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+
                 z-index: 1;
             }
 
-            /* Gradients */
-            .bg-gradient-primary {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            .stat-icon i {
+                font-size: 1.45rem;
             }
 
-            .bg-gradient-success {
-                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            .stat-label {
+                display: block;
+
+                color: rgba(255, 255, 255, 0.72);
+
+                font-size: 0.72rem;
+                font-weight: 700;
+
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
             }
 
-            .bg-gradient-warning {
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            .stat-value {
+                color: #fff;
+
+                font-size: 1.7rem;
+                line-height: 1.2;
+
+                font-weight: 800;
+
+                margin-top: 5px;
             }
 
-            .bg-gradient-info {
-                background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
-            }
+
+            /* ================================================================
+               CONTENT CARDS
+            ================================================================ */
 
             .content-card {
-                background: #ffffff;
-                border: none;
-                border-radius: 1rem;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                background: var(--sw-surface);
+
+                border: 1px solid var(--sw-border);
+
+                border-radius: var(--sw-radius);
+
+                box-shadow: var(--sw-shadow);
+
+                overflow: hidden;
+
+                transition:
+                    box-shadow 0.25s ease,
+                    transform 0.25s ease;
+            }
+
+            .content-card:hover {
+                box-shadow:
+                    0 14px 38px rgba(16, 35, 63, 0.08);
             }
 
             .content-card .card-header {
-                background: transparent;
-                border-bottom: 1px solid #f1f1f1;
-                padding: 1.25rem 1.5rem;
+                background: #fff;
+
+                border-bottom: 1px solid var(--sw-border);
+
+                padding: 18px 22px;
             }
 
             .content-card .card-title {
-                font-weight: 700;
-                color: #333;
-                font-size: 1rem;
+                color: var(--sw-text);
+
+                font-size: 0.96rem;
+                font-weight: 800;
+
                 margin: 0;
             }
 
-            /* Table Styling */
-            .modern-table thead th {
-                background-color: #f8f9fa;
-                color: #6c757d;
+            .content-card .card-title i {
+                color: var(--sw-primary);
+            }
+
+
+            /* ================================================================
+               QUICK ACTIONS
+            ================================================================ */
+
+            .btn-action {
+                min-height: 50px;
+
+                border-radius: 12px;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
                 font-weight: 700;
-                font-size: 0.8rem;
+                font-size: 0.9rem;
+
+                transition:
+                    transform 0.2s ease,
+                    box-shadow 0.2s ease;
+            }
+
+            .btn-action:hover {
+                transform: translateY(-2px);
+            }
+
+            .btn-action.btn-primary {
+                background:
+                    linear-gradient(
+                        135deg,
+                        var(--sw-primary),
+                        var(--sw-primary-dark)
+                    );
+
+                border-color: var(--sw-primary);
+
+                box-shadow:
+                    0 8px 20px rgba(13, 110, 253, 0.2);
+            }
+
+            .btn-action.btn-outline-secondary {
+                color: var(--sw-primary);
+                border-color: #cbd9ed;
+                background: var(--sw-blue-soft);
+            }
+
+            .btn-action.btn-outline-secondary:hover {
+                color: #fff;
+                background: var(--sw-primary);
+                border-color: var(--sw-primary);
+            }
+
+
+            /* ================================================================
+               TABLE
+            ================================================================ */
+
+            .modern-table {
+                margin: 0;
+            }
+
+            .modern-table thead th {
+                background:
+                    linear-gradient(
+                        180deg,
+                        #f8fbff,
+                        #f3f7fc
+                    );
+
+                color: #62728a;
+
+                font-size: 0.72rem;
+                font-weight: 800;
+
                 text-transform: uppercase;
-                letter-spacing: 0.5px;
-                border-bottom: 2px solid #e9ecef;
-                padding: 1rem;
+                letter-spacing: 0.7px;
+
+                border-bottom: 1px solid var(--sw-border);
+
+                padding: 15px 18px;
+
+                white-space: nowrap;
+            }
+
+            .modern-table tbody td {
+                color: #34465f;
+
+                font-size: 0.87rem;
+
+                padding: 16px 18px;
+
+                border-color: #edf1f6;
+
+                vertical-align: middle;
             }
 
             .modern-table tbody tr {
-                transition: background 0.2s;
+                transition:
+                    background 0.2s ease,
+                    transform 0.2s ease;
             }
 
             .modern-table tbody tr:hover {
-                background-color: rgba(102, 126, 234, 0.05);
+                background: #f6faff;
             }
 
-            .btn-action {
-                padding: 0.75rem 1.5rem;
-                border-radius: 0.8rem;
-                font-weight: 600;
-                font-size: 0.9rem;
-                transition: all 0.2s;
+            .modern-table tbody td strong {
+                color: var(--sw-primary-dark);
+                font-weight: 800;
             }
 
-            /* Top Action Bar Styles */
-            .top-action-bar {
-                background: #ffffff;
-                border-radius: 1rem;
-                padding: 1.25rem;
-                margin-bottom: 1.5rem;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+            /* ================================================================
+               STATUS BADGES
+               EACH ORDER STATUS HAS ITS OWN COLOR
+            ================================================================ */
+
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+
+                padding: 7px 12px;
+
+                border-radius: 999px;
+
+                font-size: 0.74rem;
+                font-weight: 800;
+
+                white-space: nowrap;
+
+                border: 1px solid transparent;
+            }
+
+            .status-badge i {
+                font-size: 0.48rem;
+            }
+
+
+            /* PENDING - AMBER */
+
+            .status-pending {
+                color: #92400e;
+                background: #fff7ed;
+                border-color: #fed7aa;
+
+                box-shadow:
+                    0 3px 10px rgba(245, 158, 11, 0.08);
+            }
+
+            .status-pending i {
+                color: #f59e0b;
+            }
+
+
+            /* PROCESSING - BLUE */
+
+            .status-processing {
+                color: #075985;
+                background: #e0f2fe;
+                border-color: #bae6fd;
+
+                box-shadow:
+                    0 3px 10px rgba(14, 165, 233, 0.08);
+            }
+
+            .status-processing i {
+                color: #0284c7;
+            }
+
+
+            /* READY - PURPLE */
+
+            .status-ready {
+                color: #6b21a8;
+                background: #faf5ff;
+                border-color: #e9d5ff;
+
+                box-shadow:
+                    0 3px 10px rgba(147, 51, 234, 0.08);
+            }
+
+            .status-ready i {
+                color: #9333ea;
+            }
+
+
+            /* DELIVERED - GREEN */
+
+            .status-delivered {
+                color: #166534;
+                background: #dcfce7;
+                border-color: #bbf7d0;
+
+                box-shadow:
+                    0 3px 10px rgba(22, 163, 74, 0.08);
+            }
+
+            .status-delivered i {
+                color: #16a34a;
+            }
+
+
+            /* CANCELLED - RED */
+
+            .status-cancelled {
+                color: #991b1b;
+                background: #fef2f2;
+                border-color: #fecaca;
+
+                box-shadow:
+                    0 3px 10px rgba(220, 53, 69, 0.08);
+            }
+
+            .status-cancelled i {
+                color: #dc3545;
+            }
+
+
+            /* FALLBACK / OTHER STATUS */
+
+            .status-info {
+                color: #334155;
+                background: #f1f5f9;
+                border-color: #e2e8f0;
+            }
+
+            .status-info i {
+                color: #64748b;
+            }
+
+
+            /* ================================================================
+               RECEIPT BUTTON
+            ================================================================ */
+
+            .receipt-btn {
+                border-radius: 9px;
+
+                color: var(--sw-primary);
+
+                background: #f1f6ff;
+
+                border: 1px solid #d7e4f7;
+
+                font-size: 0.76rem;
+                font-weight: 700;
+
+                padding: 7px 12px;
+
+                transition: all 0.2s ease;
+            }
+
+            .receipt-btn:hover {
+                color: #fff;
+
+                background: var(--sw-primary);
+
+                border-color: var(--sw-primary);
+
+                transform: translateY(-1px);
+            }
+
+
+            /* ================================================================
+               CHART AREA
+            ================================================================ */
+
+            .chart-container {
+                position: relative;
+
+                height: 330px;
+
+                width: 100%;
+            }
+
+
+            /* ================================================================
+               PREMIUM FOOTER
+            ================================================================ */
+
+            .smartwash-footer {
+                margin-top: 32px;
+
+                background:
+                    linear-gradient(
+                        135deg,
+                        #061d45 0%,
+                        #082f6b 50%,
+                        #0d6efd 100%
+                    );
+
+                color: #fff;
+
+                position: relative;
+
+                overflow: hidden;
+            }
+
+            .smartwash-footer::before {
+                content: "";
+
+                position: absolute;
+
+                width: 280px;
+                height: 280px;
+
+                right: -100px;
+                top: -150px;
+
+                border-radius: 50%;
+
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .smartwash-footer::after {
+                content: "";
+
+                position: absolute;
+
+                width: 180px;
+                height: 180px;
+
+                left: -90px;
+                bottom: -100px;
+
+                border-radius: 50%;
+
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+            .footer-inner {
+                position: relative;
+
+                z-index: 2;
+
+                padding: 26px 28px;
+
                 display: flex;
+
+                align-items: center;
+
+                justify-content: space-between;
+
+                gap: 20px;
+
                 flex-wrap: wrap;
-                gap: 0.75rem;
             }
 
-            .top-action-bar .btn {
-                flex-grow: 1;
-                text-align: center;
-                border-radius: 0.6rem;
+            .footer-brand {
+                display: flex;
+
+                align-items: center;
+
+                gap: 12px;
+            }
+
+            .footer-logo {
+                width: 42px;
+                height: 42px;
+
+                border-radius: 12px;
+
+                display: flex;
+
+                align-items: center;
+                justify-content: center;
+
+                color: var(--sw-primary);
+
+                background: #fff;
+
+                box-shadow:
+                    0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .footer-brand-title {
+                font-size: 0.95rem;
+                font-weight: 800;
+
+                margin: 0;
+            }
+
+            .footer-brand-subtitle {
+                margin: 2px 0 0;
+
+                color: rgba(255, 255, 255, 0.65);
+
+                font-size: 0.72rem;
+            }
+
+            .footer-copy {
+                color: rgba(255, 255, 255, 0.7);
+
+                font-size: 0.76rem;
+
+                margin: 0;
+            }
+
+            .footer-links {
+                display: flex;
+
+                align-items: center;
+
+                gap: 18px;
+            }
+
+            .footer-links a {
+                color: rgba(255, 255, 255, 0.75);
+
+                text-decoration: none;
+
+                font-size: 0.76rem;
+
                 font-weight: 600;
-                padding: 0.6rem 1rem;
-                font-size: 0.85rem;
+
+                transition: color 0.2s ease;
             }
 
-            @media (max-width: 768px) {
+            .footer-links a:hover {
+                color: #fff;
+            }
+
+
+            /* ================================================================
+               RESPONSIVE
+            ================================================================ */
+
+            @media (max-width: 991.98px) {
+
                 .top-action-bar .btn {
-                    flex-grow: 0 0 48%;
+                    flex: 1 1 calc(50% - 10px);
+                }
+
+                .chart-container {
+                    height: 280px;
+                }
+            }
+
+
+            @media (max-width: 767.98px) {
+
+                .smartwash-dashboard {
+                    padding-left: 8px;
+                    padding-right: 8px;
+                }
+
+                .top-action-bar {
+                    padding: 10px;
+                }
+
+                .top-action-bar .btn {
+                    flex: 1 1 100%;
+                }
+
+                .stat-value {
+                    font-size: 1.45rem;
+                }
+
+                .stat-icon {
+                    width: 54px;
+                    height: 54px;
+                }
+
+                .content-card .card-header {
+                    padding: 15px;
+                }
+
+                .modern-table thead th,
+                .modern-table tbody td {
+                    padding: 12px;
+                }
+
+                .footer-inner {
+                    text-align: center;
+
+                    justify-content: center;
+                }
+
+                .footer-brand {
+                    justify-content: center;
+
+                    width: 100%;
+                }
+
+                .footer-copy {
+                    width: 100%;
+                }
+
+                .footer-links {
+                    width: 100%;
+
+                    justify-content: center;
                 }
             }
         </style>
 
-        <div class="container-fluid mt-4">
 
-            <!-- ==================== TOP ACTION BUTTONS ==================== -->
-            <div class="top-action-bar">
-                <a href="{{ route('pos.index') }}" class="btn btn-primary shadow-sm">
-                    <i class="bi bi-plus-circle mr-1"></i> Make New Order
-                </a>
-                <a href="{{ route('orders.index', ['filter' => 'today']) }}" class="btn btn-outline-primary">
-                    <i class="bi bi-calendar-day mr-1"></i> View Today's Orders
-                </a>
-                <a href="{{ route('orders.index', ['filter' => 'pending']) }}" class="btn btn-outline-warning text-warning">
-                    <i class="bi bi-hourglass-split mr-1"></i> View Pending Orders
-                </a>
-                <a href="{{ route('orders.index', ['filter' => 'completed']) }}"
-                    class="btn btn-outline-success text-success">
-                    <i class="bi bi-check-circle mr-1"></i> View Completed Orders
-                </a>
-                <a href="{{ route('sales.monthly') }}" class="btn btn-outline-info text-info">
-                    <i class="bi bi-graph-up mr-1"></i> View All Sales (Month)
-                </a>
-            </div>
+        <div class="smartwash-dashboard">
 
-            <!-- ==================== STATS ROW ==================== -->
-            <div class="row mb-4">
-                <!-- Card 1: Today's Sales (Ksh Logic Applied) -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card h-100 modern-card stat-card bg-gradient-primary text-white">
-                        <div class="card-body d-flex align-items-center p-4">
-                            <div class="stat-icon text-white me-3">
-                                <i class="bi bi-currency-dollar fa-2x"></i>
-                            </div>
-                            <div class="position-relative z-index-1">
-                                <span class="text-white-50 text-uppercase small">Today's Sales</span>
-                                <h3 class="mb-0 font-weight-bold mt-1">
-                                    Ksh {{ number_format($todaySales, 2) }}
-                                </h3>
-                            </div>
-                        </div>
-                    </div>
+            <div class="container-fluid pt-4">
+
+                {{-- =========================================================
+                     TOP ACTIONS
+                ========================================================== --}}
+
+                <div class="top-action-bar">
+
+                    <a href="{{ route('pos.index') }}"
+                       class="btn btn-primary">
+
+                        <i class="bi bi-plus-circle"></i>
+
+                        Make New Order
+                    </a>
+
+
+                    <a href="{{ route('orders.index', ['filter' => 'today']) }}"
+                       class="btn btn-outline-primary">
+
+                        <i class="bi bi-calendar-day"></i>
+
+                        Today's Orders
+                    </a>
+
+
+                    <a href="{{ route('orders.index', ['filter' => 'pending']) }}"
+                       class="btn btn-outline-warning">
+
+                        <i class="bi bi-hourglass-split"></i>
+
+                        Pending Orders
+                    </a>
+
+
+                    <a href="{{ route('orders.index', ['filter' => 'completed']) }}"
+                       class="btn btn-outline-success">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Completed Orders
+                    </a>
+
+
+                    <a href="{{ route('sales.monthly') }}"
+                       class="btn btn-outline-info">
+
+                        <i class="bi bi-graph-up"></i>
+
+                        Monthly Sales
+                    </a>
+
                 </div>
 
-                <!-- Card 2: Today's Orders -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card h-100 modern-card stat-card bg-gradient-success text-white">
-                        <div class="card-body d-flex align-items-center p-4">
-                            <div class="stat-icon text-white me-3">
-                                <i class="bi bi-bag-check fa-2x"></i>
+
+                {{-- =========================================================
+                     STATISTICS
+                ========================================================== --}}
+
+                <div class="row mb-4">
+
+                    {{-- Today's Sales --}}
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+
+                        <div class="card h-100 modern-card stat-card bg-gradient-primary">
+
+                            <div class="card-body d-flex align-items-center p-4">
+
+                                <div class="stat-icon text-white me-3">
+
+                                    <i class="bi bi-currency-dollar"></i>
+
+                                </div>
+
+                                <div class="position-relative">
+
+                                    <span class="stat-label">
+                                        Today's Sales
+                                    </span>
+
+                                    <div class="stat-value">
+                                        Ksh {{ number_format($todaySales, 2) }}
+                                    </div>
+
+                                </div>
+
                             </div>
-                            <div class="position-relative z-index-1">
-                                <span class="text-white-50 text-uppercase small">Today's Orders</span>
-                                <h3 class="mb-0 font-weight-bold mt-1">{{ $totalOrders }}</h3>
-                            </div>
+
                         </div>
+
                     </div>
+
+
+                    {{-- Today's Orders --}}
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+
+                        <div class="card h-100 modern-card stat-card bg-gradient-success">
+
+                            <div class="card-body d-flex align-items-center p-4">
+
+                                <div class="stat-icon text-white me-3">
+
+                                    <i class="bi bi-bag-check"></i>
+
+                                </div>
+
+                                <div class="position-relative">
+
+                                    <span class="stat-label">
+                                        Today's Orders
+                                    </span>
+
+                                    <div class="stat-value">
+                                        {{ $totalOrders }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Pending Orders --}}
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+
+                        <div class="card h-100 modern-card stat-card bg-gradient-warning">
+
+                            <div class="card-body d-flex align-items-center p-4">
+
+                                <div class="stat-icon text-white me-3">
+
+                                    <i class="bi bi-hourglass-split"></i>
+
+                                </div>
+
+                                <div class="position-relative">
+
+                                    <span class="stat-label">
+                                        Pending Processing
+                                    </span>
+
+                                    <div class="stat-value">
+                                        {{ $pendingOrders }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Ready for Pickup --}}
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+
+                        <div class="card h-100 modern-card stat-card bg-gradient-info">
+
+                            <div class="card-body d-flex align-items-center p-4">
+
+                                <div class="stat-icon text-white me-3">
+
+                                    <i class="bi bi-bell"></i>
+
+                                </div>
+
+                                <div class="position-relative">
+
+                                    <span class="stat-label">
+                                        Ready for Pickup
+                                    </span>
+
+                                    <div class="stat-value">
+                                        {{ $readyOrders }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <!-- Card 3: Pending Orders (Issued Status Logic Visualized) -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card h-100 modern-card stat-card bg-gradient-warning text-white">
-                        <div class="card-body d-flex align-items-center p-4">
-                            <div class="stat-icon text-white me-3">
-                                <i class="bi bi-hourglass-split fa-2x"></i>
+
+                {{-- =========================================================
+                     CHART + QUICK ACTIONS
+                ========================================================== --}}
+
+                <div class="row mb-4">
+
+                    {{-- Sales Chart --}}
+
+                    <div class="col-xl-8 col-lg-7 mb-4 mb-xl-0">
+
+                        <div class="card content-card h-100">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h6 class="card-title">
+
+                                    <i class="bi bi-graph-up-arrow me-2"></i>
+
+                                    Earnings Overview
+
+                                </h6>
+
+
+                                <span class="badge rounded-pill"
+                                      style="
+                                          background:#eaf3ff;
+                                          color:#0d6efd;
+                                          padding:7px 11px;
+                                          font-weight:700;
+                                      ">
+
+                                    Last 7 Days
+
+                                </span>
+
                             </div>
-                            <div class="position-relative z-index-1">
-                                <span class="text-white-50 text-uppercase small">Pending Processing</span>
-                                <h3 class="mb-0 font-weight-bold mt-1">{{ $pendingOrders }}</h3>
+
+
+                            <div class="card-body">
+
+                                <div class="chart-container">
+
+                                    <canvas id="salesChart"></canvas>
+
+                                </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
+
+                    {{-- Quick Actions --}}
+
+                    <div class="col-xl-4 col-lg-5">
+
+                        <div class="card content-card h-100">
+
+                            <div class="card-header">
+
+                                <h6 class="card-title">
+
+                                    <i class="bi bi-lightning-charge-fill me-2"></i>
+
+                                    Quick Actions
+
+                                </h6>
+
+                            </div>
+
+
+                            <div class="card-body d-flex flex-column justify-content-center p-4">
+
+                                <a href="{{ route('pos.index') }}"
+                                   class="btn btn-action btn-primary mb-3">
+
+                                    <i class="bi bi-plus-circle me-2"></i>
+
+                                    Create New Order
+
+                                </a>
+
+
+                                <a href="{{ route('orders.index') }}"
+                                   class="btn btn-action btn-outline-secondary">
+
+                                    <i class="bi bi-list-ul me-2"></i>
+
+                                    View All Orders
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <!-- Card 4: Ready for Pickup -->
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card h-100 modern-card stat-card bg-gradient-info text-white">
-                        <div class="card-body d-flex align-items-center p-4">
-                            <div class="stat-icon text-white me-3">
-                                <i class="bi bi-bell fa-2x"></i>
+
+                {{-- =========================================================
+                     RECENT ORDERS
+                ========================================================== --}}
+
+                <div class="row">
+
+                    <div class="col-12">
+
+                        <div class="card content-card">
+
+                            <div class="card-header d-flex justify-content-between align-items-center">
+
+                                <h6 class="card-title">
+
+                                    <i class="bi bi-clock-history me-2"></i>
+
+                                    Recent Orders
+
+                                </h6>
+
+
+                                <a href="{{ route('orders.index') }}"
+                                   class="small text-decoration-none fw-bold"
+                                   style="color:#0d6efd;">
+
+                                    View All
+
+                                    <i class="bi bi-arrow-right ms-1"></i>
+
+                                </a>
+
                             </div>
-                            <div class="position-relative z-index-1">
-                                <span class="text-white-50 text-uppercase small">Ready for Pickup</span>
-                                <h3 class="mb-0 font-weight-bold mt-1">{{ $readyOrders }}</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- ==================== CHARTS & ACTIONS ROW ==================== -->
-            <div class="row mb-4">
-                <!-- Sales Chart -->
-                <div class="col-xl-8 col-lg-7">
-                    <div class="card content-card">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="card-title"><i class="fas fa-chart-line mr-2 text-primary"></i> Earnings Overview
-                                (Last 7 Days)</h6>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="salesChart" height="120"></canvas>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Quick Actions -->
-                <div class="col-xl-4 col-lg-5">
-                    <div class="card content-card h-100">
-                        <div class="card-header py-3">
-                            <h6 class="card-title"><i class="fas fa-bolt mr-2 text-warning"></i> Quick Actions</h6>
-                        </div>
-                        <div class="card-body d-flex flex-column justify-content-center p-4">
-                            <a href="{{ route('pos.index') }}" class="btn btn-action btn-primary mb-3 shadow-sm">
-                                <i class="bi bi-plus-circle mr-2"></i> Create New Order
-                            </a>
-                            <a href="{{ route('orders.index') }}" class="btn btn-action btn-outline-secondary">
-                                <i class="bi bi-list-ul mr-2"></i> View All Orders
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            <div class="card-body p-0">
 
-            <!-- ==================== RECENT ORDERS TABLE ==================== -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card content-card">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="card-title"><i class="fas fa-history mr-2 text-info"></i> Recent Orders</h6>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover modern-table mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Invoice #</th>
-                                            <th>Customer</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($recentOrders as $order)
+                                <div class="table-responsive">
+
+                                    <table class="table table-hover modern-table mb-0">
+
+                                        <thead>
+
                                             <tr>
-                                                <td><strong>{{ $order->invoice_no }}</strong></td>
-                                                <td>{{ $order->customer_name }}</td>
-                                                <!-- Updated to Ksh -->
-                                                <td>Ksh {{ number_format($order->total_amount, 2) }}</td>
-                                                <td>
-                                                    @php
-                                                        // Logic: Delivered (Green), Pending (Blue), Others (Teal)
-                                                        $status_class =
-                                                            $order->status == 'delivered'
-                                                                ? 'success'
-                                                                : ($order->status == 'pending'
-                                                                    ? 'primary'
-                                                                    : 'info');
-                                                    @endphp
 
-                                                    @if ($order->status == 'pending')
-                                                        <!-- Force Blue Button with White Text for Visibility -->
-                                                        <span class="badge badge-pill px-3 py-1"
-                                                            style="background-color: #0d6efd; color: #ffffff; font-size: 0.85rem; font-weight: 600;">
-                                                            {{ ucfirst($order->status) }}
-                                                        </span>
-                                                    @else
-                                                        <!-- Standard badges for other statuses -->
-                                                        <span class="badge badge-pill badge-{{ $status_class }} px-3 py-1">
-                                                            {{ ucfirst($order->status) }}
-                                                        </span>
-                                                    @endif
-                                                </td>
-                                                <td>{{ $order->created_at->format('M d, Y h:i A') }}</td>
-                                                <td>
-                                                    <a href="{{ route('pos.receipt', $order->id) }}"
-                                                        class="btn btn-sm btn-light text-primary border" target="_blank">
-                                                        <i class="fas fa-receipt mr-1"></i> Receipt
-                                                    </a>
-                                                </td>
+                                                <th>Invoice #</th>
+
+                                                <th>Customer</th>
+
+                                                <th>Total</th>
+
+                                                <th>Status</th>
+
+                                                <th>Date</th>
+
+                                                <th>Action</th>
+
                                             </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted py-5">
-                                                    <i class="fas fa-box-open fa-3x mb-3 d-block"></i>
-                                                    No recent orders found.
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+
+                                        </thead>
+
+
+                                        <tbody>
+
+                                            @forelse($recentOrders as $order)
+
+                                                <tr>
+
+                                                    {{-- Invoice --}}
+
+                                                    <td>
+
+                                                        <strong>
+                                                            {{ $order->invoice_no }}
+                                                        </strong>
+
+                                                    </td>
+
+
+                                                    {{-- Customer --}}
+
+                                                    <td>
+
+                                                        <div class="fw-semibold">
+
+                                                            {{ $order->customer_name ?? 'Walk-in Customer' }}
+
+                                                        </div>
+
+                                                    </td>
+
+
+                                                    {{-- Total --}}
+
+                                                    <td>
+
+                                                        <strong style="color:#10233f;">
+
+                                                            Ksh
+                                                            {{ number_format($order->total_amount, 2) }}
+
+                                                        </strong>
+
+                                                    </td>
+
+
+                                                    {{-- Status --}}
+
+                                                    <td>
+
+                                                        @php
+
+                                                            $status = strtolower(
+                                                                trim($order->status ?? 'pending')
+                                                            );
+
+                                                            /*
+                                                             * Status → Visual Class
+                                                             *
+                                                             * pending    = amber
+                                                             * processing = blue
+                                                             * ready      = purple
+                                                             * delivered  = green
+                                                             * cancelled  = red
+                                                             */
+
+                                                            $status_class = match ($status) {
+
+                                                                'pending'
+                                                                    => 'status-pending',
+
+                                                                'processing'
+                                                                    => 'status-processing',
+
+                                                                'ready'
+                                                                    => 'status-ready',
+
+                                                                'delivered'
+                                                                    => 'status-delivered',
+
+                                                                'cancelled'
+                                                                    => 'status-cancelled',
+
+                                                                default
+                                                                    => 'status-info',
+
+                                                            };
+
+
+                                                            $status_icon = match ($status) {
+
+                                                                'pending'
+                                                                    => 'bi-hourglass-split',
+
+                                                                'processing'
+                                                                    => 'bi-arrow-repeat',
+
+                                                                'ready'
+                                                                    => 'bi-check2-circle',
+
+                                                                'delivered'
+                                                                    => 'bi-check-circle-fill',
+
+                                                                'cancelled'
+                                                                    => 'bi-x-circle-fill',
+
+                                                                default
+                                                                    => 'bi-circle-fill',
+
+                                                            };
+
+                                                        @endphp
+
+
+                                                        <span class="status-badge {{ $status_class }}">
+
+                                                            <i class="bi {{ $status_icon }}"></i>
+
+                                                            {{ ucfirst($status) }}
+
+                                                        </span>
+
+                                                    </td>
+
+
+                                                    {{-- Date --}}
+
+                                                    <td>
+
+                                                        <span style="color:#718096;">
+
+                                                            {{ $order->created_at->format('M d, Y h:i A') }}
+
+                                                        </span>
+
+                                                    </td>
+
+
+                                                    {{-- Receipt --}}
+
+                                                    <td>
+
+                                                        <a href="{{ route('pos.receipt', $order->id) }}"
+                                                           class="btn btn-sm receipt-btn"
+                                                           target="_blank"
+                                                           rel="noopener">
+
+                                                            <i class="bi bi-receipt me-1"></i>
+
+                                                            Receipt
+
+                                                        </a>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            @empty
+
+                                                <tr>
+
+                                                    <td colspan="6"
+                                                        class="text-center py-5">
+
+                                                        <div style="color:#94a3b8;">
+
+                                                            <i class="bi bi-inbox"
+                                                               style="font-size:3rem;"></i>
+
+                                                            <div class="mt-2 fw-semibold">
+
+                                                                No recent orders found.
+
+                                                            </div>
+
+                                                            <small>
+
+                                                                New orders will appear here.
+
+                                                            </small>
+
+                                                        </div>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            @endforelse
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
+
+            {{-- =============================================================
+                 PREMIUM FOOTER
+            ============================================================== --}}
+
+            <footer class="smartwash-footer">
+
+                <div class="container-fluid">
+
+                    <div class="footer-inner">
+
+                        <div class="footer-brand">
+
+                            <div class="footer-logo">
+
+                                <i class="bi bi-droplet-fill"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <p class="footer-brand-title">
+
+                                    SmartWash
+
+                                </p>
+
+                                <p class="footer-brand-subtitle">
+
+                                    Laundry Management System
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <p class="footer-copy">
+
+                            © {{ date('Y') }} SmartWash.
+
+                            All rights reserved.
+
+                        </p>
+
+
+                        <div class="footer-links">
+
+                            <a href="{{ route('pos.dashboard') }}">
+
+                                Dashboard
+
+                            </a>
+
+
+                            <a href="{{ route('orders.index') }}">
+
+                                Orders
+
+                            </a>
+
+
+                            <a href="{{ route('sales.monthly') }}">
+
+                                Reports
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </footer>
+
         </div>
+
     @endsection
 
+
     @push('scripts')
-        <!-- Chart.js Library -->
+
+        {{-- ================================================================
+             CHART.JS
+        ================================================================= --}}
+
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script>
-            // Sales Chart Logic
-            const ctx = document.getElementById('salesChart').getContext('2d');
 
-            // Prepare PHP data for JS
-            const labels = {!! json_encode(array_keys($salesData->toArray())) !!};
-            const data = {!! json_encode(array_values($salesData->toArray())) !!};
+            document.addEventListener('DOMContentLoaded', function () {
 
-            const myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Sales (Ksh)',
-                        data: data,
-                        backgroundColor: "rgba(102, 126, 234, 0.1)",
-                        borderColor: "rgba(102, 126, 234, 1)",
-                        pointBackgroundColor: "#fff",
-                        pointBorderColor: "rgba(102, 126, 234, 1)",
-                        pointHoverBackgroundColor: "rgba(102, 126, 234, 1)",
-                        pointHoverBorderColor: "#fff",
-                        borderWidth: 3,
-                        pointRadius: 4,
-                        pointBorderWidth: 2,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: "#f1f1f1",
-                                drawBorder: false,
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return 'Ksh ' + value.toLocaleString();
-                                },
-                                font: {
-                                    family: "'Segoe UI', sans-serif"
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false,
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: '#333',
-                            titleFont: {
-                                size: 14
-                            },
-                            bodyFont: {
-                                size: 12
-                            },
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Ksh ' + context.parsed.y.toLocaleString();
-                                }
-                            }
-                        }
-                    }
+                const canvas = document.getElementById('salesChart');
+
+                if (!canvas) {
+                    return;
                 }
+
+                const ctx = canvas.getContext('2d');
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | PHP → JavaScript Data
+                |--------------------------------------------------------------------------
+                */
+
+                const labels = {!! json_encode(array_keys($salesData->toArray())) !!};
+
+                const data = {!! json_encode(array_values($salesData->toArray())) !!};
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Chart Gradient
+                |--------------------------------------------------------------------------
+                */
+
+                const gradient = ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    330
+                );
+
+                gradient.addColorStop(
+                    0,
+                    'rgba(13, 110, 253, 0.22)'
+                );
+
+                gradient.addColorStop(
+                    1,
+                    'rgba(13, 110, 253, 0.01)'
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Sales Chart
+                |--------------------------------------------------------------------------
+                */
+
+                new Chart(ctx, {
+
+                    type: 'line',
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: [{
+
+                            label: 'Sales (Ksh)',
+
+                            data: data,
+
+                            backgroundColor: gradient,
+
+                            borderColor: '#0d6efd',
+
+                            pointBackgroundColor: '#ffffff',
+
+                            pointBorderColor: '#0d6efd',
+
+                            pointHoverBackgroundColor: '#0d6efd',
+
+                            pointHoverBorderColor: '#ffffff',
+
+                            borderWidth: 3,
+
+                            pointRadius: 4,
+
+                            pointHoverRadius: 6,
+
+                            pointBorderWidth: 2,
+
+                            tension: 0.42,
+
+                            fill: true
+
+                        }]
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+
+                        interaction: {
+
+                            intersect: false,
+
+                            mode: 'index'
+
+                        },
+
+
+                        scales: {
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                border: {
+                                    display: false
+                                },
+
+                                grid: {
+
+                                    color: 'rgba(226, 232, 240, 0.75)',
+
+                                    drawTicks: false
+
+                                },
+
+                                ticks: {
+
+                                    padding: 10,
+
+                                    color: '#718096',
+
+                                    callback: function (value) {
+
+                                        return 'Ksh ' +
+                                            Number(value).toLocaleString();
+
+                                    },
+
+                                    font: {
+
+                                        family: "'Segoe UI', sans-serif",
+
+                                        size: 11
+
+                                    }
+
+                                }
+
+                            },
+
+
+                            x: {
+
+                                border: {
+                                    display: false
+                                },
+
+                                grid: {
+                                    display: false
+                                },
+
+                                ticks: {
+
+                                    color: '#718096',
+
+                                    padding: 8,
+
+                                    font: {
+
+                                        family: "'Segoe UI', sans-serif",
+
+                                        size: 11
+
+                                    }
+
+                                }
+
+                            }
+
+                        },
+
+
+                        plugins: {
+
+                            legend: {
+
+                                display: false
+
+                            },
+
+
+                            tooltip: {
+
+                                backgroundColor: '#062b68',
+
+                                titleColor: '#ffffff',
+
+                                bodyColor: '#ffffff',
+
+                                padding: 12,
+
+                                cornerRadius: 10,
+
+                                displayColors: false,
+
+
+                                callbacks: {
+
+                                    label: function (context) {
+
+                                        return 'Ksh ' +
+                                            Number(
+                                                context.parsed.y
+                                            ).toLocaleString();
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                });
+
             });
+
         </script>
+
     @endpush
+
 </x-layout>
