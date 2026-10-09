@@ -2,52 +2,78 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Customer;
-use App\Models\Service;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Str;
-
-use Barryvdh\DomPDF\Facade\Pdf; // CORRECTED: Changed from Illuminate\Support\Pdf
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Service;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+use App\Models\OnlineOrder;
 
 class POSController extends Controller
 {
     /**
-     * Display the Dashboard.
+     * Display the SmartWash dashboard.
      */
     public function dashboard()
     {
-        // 1. Calculate Key Metrics
-        $todaySales = Order::whereDate('created_at', today())
-            ->where('status', '!=', 'cancelled')
+        $today = today();
+
+        $validOrders = Order::query()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', 'cancelled');
+            });
+
+        $todaySales = (clone $validOrders)
+            ->whereDate('created_at', $today)
             ->sum('total_amount');
 
-        $totalOrders = Order::whereDate('created_at', today())->count();
+        $totalOrders = (clone $validOrders)
+            ->whereDate('created_at', $today)
+            ->count();
+
         $pendingOrders = Order::where('status', 'pending')->count();
 
-        // CHANGE: Count 'delivered' orders as 'Ready for Pickup'
-        $readyOrders = Order::where('status', 'delivered')->count();
+        // "Ready for Pickup" corresponds to the ready status.
+        $readyOrders = Order::where('status', 'ready')->count();
 
-        // 2. Get Recent Orders
         $recentOrders = Order::with('customer')
             ->latest()
             ->take(5)
             ->get();
 
-        // 3. Data for Chart (Last 7 Days Sales)
-        $salesData = Order::select(
-            DB::raw('DATE(created_at) as date'),
-            DB::raw('SUM(total_amount) as total')
-        )
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->where('status', '!=', 'cancelled')
+        // Include all seven calendar dates, even dates with zero sales.
+        $salesData = collect();
+
+        $startDate = now()->subDays(6)->startOfDay();
+
+        $dailySales = (clone $validOrders)
+            ->whereBetween('created_at', [
+                $startDate,
+                now()->endOfDay(),
+            ])
+            ->selectRaw('DATE(created_at) as date')
+            ->selectRaw('SUM(total_amount) as total')
             ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->pluck('total', 'date');
+            ->orderBy('date')
+            ->get()
+            ->keyBy('date');
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = $startDate->copy()->addDays($i)->toDateString();
+
+            $salesData->put(
+                $date,
+                (float) ($dailySales->get($date)->total ?? 0)
+            );
+        }
 
         return view('dashboard', compact(
             'todaySales',
@@ -60,58 +86,39 @@ class POSController extends Controller
     }
 
     /**
-     * Display the POS Terminal.
+     * Display the SmartWash POS terminal.
      */
-    // public function index()
-    // {
-    //     // Get filter inputs
-    //     $startDate = request('start_date');
-    //     $endDate = request('end_date');
+    public function index()
+    {
+        $services = Service::query()
+            ->orderBy('name')
+            ->get();
 
-    //     // Base Query
-    //     $query = Order::latest();
+        return view('pos.index', compact('services'));
+    }
 
-    //     // Apply Date Filter if present
-    //     if ($startDate && $endDate) {
-    //         $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
-    //     }
-
-    //     // Get Orders with Pagination
-    //     $orders = $query->paginate(15);
-
-    //     // Calculate Stats
-    //     if ($startDate && $endDate) {
-    //         // If filter is active, calculate total for that period
-    //         $todaySales = Order::whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])->sum('total_amount');
-    //     } else {
-    //         // Default: Today's sales
-    //         $todaySales = Order::whereDate('created_at', today())->sum('total_amount');
-    //     }
-
-    //     // These usually stay the same regardless of filter
-    //     $weekSales = Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->sum('total_amount');
-    //     $monthSales = Order::whereMonth('created_at', now()->month)->sum('total_amount');
-
-    //     return view('orders.index', compact('orders', 'todaySales', 'weekSales', 'monthSales'));
-    // }
-public function index()
-{
-    // Fetch all services from the database
-    $services = Service::all(); 
-    
-    // Pass the $services variable to the view
-    return view('pos.index', compact('services')); 
-}
     /**
-     * Search Customer (AJAX).
+     * Search customers using AJAX.
      */
     public function searchCustomer(Request $request)
     {
-        $search = $request->get('query');
+        $validated = $request->validate([
+            'query' => ['nullable', 'string', 'max:100'],
+        ]);
 
-        $customers = Customer::where('phone', 'LIKE', "%{$search}%")
-            ->orWhere('name', 'LIKE', "%{$search}%")
+        $search = trim($validated['query'] ?? '');
+
+        if ($search === '') {
+            return response()->json([]);
+        }
+
+        $customers = Customer::query()
+            ->where(function ($query) use ($search) {
+                $query->where('phone', 'LIKE', "%{$search}%")
+                    ->orWhere('name', 'LIKE', "%{$search}%");
+            })
             ->select('id', 'name', 'phone', 'address')
+            ->orderBy('name')
             ->limit(10)
             ->get();
 
@@ -119,158 +126,294 @@ public function index()
     }
 
     /**
-     * Store the Order.
+     * Create a walk-in POS order.
      */
     public function storeOrder(Request $request)
     {
-        // 1. Validation
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'items' => 'required|array|min:1',
-            'items.*.service_id' => 'required|exists:services,id',
-            'items.*.quantity' => 'required|numeric|min:0.1',
-            'paid_amount' => 'nullable|numeric|min:0',
-            'notes' => 'nullable|string',
-            'pickup_date' => 'nullable|date',
+        $validated = $request->validate([
+            'customer_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'customer_phone' => [
+                'required',
+                'string',
+                'max:20',
+            ],
+            'items' => [
+                'required',
+                'array',
+                'min:1',
+                'max:100',
+            ],
+            'items.*.service_id' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:services,id',
+            ],
+            'items.*.quantity' => [
+                'required',
+                'numeric',
+                'gt:0',
+                'max:10000',
+            ],
+            'paid_amount' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+            'notes' => [
+                'nullable',
+                'string',
+                'max:2000',
+            ],
+            'pickup_date' => [
+                'nullable',
+                'date',
+                'after_or_equal:today',
+            ],
         ]);
 
         try {
-            DB::beginTransaction();
+            $order = DB::transaction(function () use ($validated) {
+                $items = collect($validated['items']);
 
-            // 2. Determine Dates
-            $pickupDate = $request->pickup_date ? \Carbon\Carbon::parse($request->pickup_date) : now();
-            $deliveryDate = now()->addDays(3);
+                $serviceIds = $items
+                    ->pluck('service_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->unique()
+                    ->values();
 
-            // 3. Create Order
-            $order = Order::create([
-                'customer_id'      => null,
-                'customer_name'    => $request->customer_name,
-                'customer_phone'   => $request->customer_phone,
-                'invoice_no'       => 'INV-' . date('Ymd') . '-' . Str::upper(Str::random(4)),
-                'pickup_date'      => $pickupDate,
-                'delivery_date'    => $deliveryDate,
-                'total_amount'     => 0,
-                'paid_amount'      => $request->paid_amount ?? 0,
-                'status'           => 'pending',
-                'payment_status'   => 'unpaid',
-                'notes'            => $request->notes,
-            ]);
+                // Fetch trusted prices from the database, not the browser.
+                $services = Service::query()
+                    ->whereIn('id', $serviceIds)
+                    ->get()
+                    ->keyBy('id');
 
-            // 4. Add Items and Calculate Total
-            $total = 0;
-            foreach ($request->items as $item) {
-                $service = Service::find($item['service_id']);
+                if ($services->count() !== $serviceIds->count()) {
+                    throw ValidationException::withMessages([
+                        'items' => 'One or more selected services no longer exist.',
+                    ]);
+                }
 
-                if (!$service) continue;
+                $total = 0;
 
-                $subtotal = $service->price * $item['quantity'];
+                $preparedItems = $items->map(
+                    function ($item) use ($services, &$total) {
+                        $service = $services->get(
+                            (int) $item['service_id']
+                        );
 
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'service_id' => $service->id,
-                    'service_name' => $service->name,
-                    'quantity' => $item['quantity'],
-                    'price' => $service->price,
-                    'subtotal' => $subtotal
+                        $quantity = (float) $item['quantity'];
+                        $price = (float) $service->price;
+
+                        if ($price < 0) {
+                            throw ValidationException::withMessages([
+                                'items' => 'A selected service has an invalid price.',
+                            ]);
+                        }
+
+                        $subtotal = round($price * $quantity, 2);
+                        $total += $subtotal;
+
+                        return [
+                            'service_id' => $service->id,
+                            'service_name' => $service->name,
+                            'quantity' => $quantity,
+                            'price' => $price,
+                            'subtotal' => $subtotal,
+                        ];
+                    }
+                );
+
+                $total = round($total, 2);
+                $paidAmount = round(
+                    (float) ($validated['paid_amount'] ?? 0),
+                    2
+                );
+
+                if ($paidAmount > $total) {
+                    throw ValidationException::withMessages([
+                        'paid_amount' => 'The amount paid cannot exceed the order total.',
+                    ]);
+                }
+
+                $paymentStatus = $paidAmount >= $total
+                    ? 'paid'
+                    : ($paidAmount > 0 ? 'partial' : 'unpaid');
+
+                $pickupDate = !empty($validated['pickup_date'])
+                    ? Carbon::parse($validated['pickup_date'])
+                    : now();
+
+                $order = Order::create([
+                    'customer_id' => null,
+                    'customer_name' => trim($validated['customer_name']),
+                    'customer_phone' => trim($validated['customer_phone']),
+                    'invoice_no' => 'INV-'
+                        . now()->format('Ymd')
+                        . '-'
+                        . Str::upper(Str::random(8)),
+                    'pickup_date' => $pickupDate,
+                    'delivery_date' => now()->addDays(3),
+                    'total_amount' => $total,
+                    'paid_amount' => $paidAmount,
+                    'status' => 'pending',
+                    'payment_status' => $paymentStatus,
+                    'notes' => $validated['notes'] ?? null,
                 ]);
 
-                $total += $subtotal;
-            }
+                foreach ($preparedItems as $item) {
+                    $order->items()->create($item);
+                }
 
-            // 5. Update Order Total and Payment Status
-            $order->total_amount = $total;
+                return $order;
+            });
 
-            if ($order->paid_amount >= $total) {
-                $order->payment_status = 'paid';
-            } elseif ($order->paid_amount > 0) {
-                $order->payment_status = 'partial';
-            } else {
-                $order->payment_status = 'unpaid';
-            }
+            return redirect()
+                ->route('pos.receipt', $order->id)
+                ->with('success', 'SmartWash order created successfully.');
 
-            $order->save();
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            Log::error('SmartWash POS order creation failed.', [
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
 
-            DB::commit();
-
-            return redirect()->route('pos.receipt', $order->id)
-                ->with('success', 'Order created successfully!');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            // THIS WILL SHOW THE ACTUAL ERROR ON SCREEN
-            dd("Error found: " . $e->getMessage());
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'order' => 'The order could not be saved. Please try again.',
+                ]);
         }
     }
 
     /**
-     * Update Order Status.
+     * Update an order's processing status.
      */
     public function updateStatus(Request $request, Order $order)
     {
-        $request->validate([
-            'status' => 'required|in:pending,processing,ready,delivered,cancelled'
+        $validated = $request->validate([
+            'status' => [
+                'required',
+                'in:pending,processing,ready,delivered,cancelled',
+            ],
         ]);
 
-        $order->update(['status' => $request->status]);
+        $order->update([
+            'status' => $validated['status'],
+        ]);
 
-        return back()->with('success', "Order #{$order->invoice_no} status updated to {$request->status}.");
+        return back()->with(
+            'success',
+            "Order #{$order->invoice_no} status updated to {$validated['status']}."
+        );
     }
 
     /**
-     * Display the Receipt.
+     * Display an order receipt.
      */
     public function receipt(Order $order)
     {
-        // We removed 'customer' because we save name/phone directly on the order now.
-        // We removed 'items.service' because we save service_name directly on the item now.
         $order->load('items');
+
         return view('pos.receipt', compact('order'));
     }
 
     /**
-     * Display list of orders (Admin/Management).
+     * Display the order management list.
      */
     public function orderList()
     {
-        // 1. Get Orders with Pagination
-        $orders = Order::latest()->paginate(15);
+        $orders = Order::query()
+            ->with('customer')
+            ->latest()
+            ->paginate(15);
 
-        // 2. Calculate Totals (Excluding Cancelled orders for financial accuracy)
-        $todaySales = Order::whereDate('created_at', today())
-            ->where('status', '!=', 'cancelled')
+        $validOrders = Order::query()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', 'cancelled');
+            });
+
+        $todaySales = (clone $validOrders)
+            ->whereDate('created_at', today())
             ->sum('total_amount');
 
-        $weekSales = Order::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
-            ->where('status', '!=', 'cancelled')
+        $weekSales = (clone $validOrders)
+            ->whereBetween('created_at', [
+                now()->startOfWeek(),
+                now()->endOfWeek(),
+            ])
             ->sum('total_amount');
 
-        $monthSales = Order::whereMonth('created_at', now()->month)
+        $monthSales = (clone $validOrders)
+            ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
-            ->where('status', '!=', 'cancelled')
             ->sum('total_amount');
 
-        return view('orders.index', compact('orders', 'todaySales', 'weekSales', 'monthSales'));
+        return view('orders.index', compact(
+            'orders',
+            'todaySales',
+            'weekSales',
+            'monthSales'
+        ));
     }
 
-    public function downloadReport()
+    /**
+     * Download an order report as PDF.
+     */
+    public function downloadReport(Request $request)
     {
-        $startDate = request('start_date');
-        $endDate = request('end_date');
+        $validated = $request->validate([
+            'start_date' => [
+                'nullable',
+                'date_format:Y-m-d',
+                'required_with:end_date',
+            ],
+            'end_date' => [
+                'nullable',
+                'date_format:Y-m-d',
+                'required_with:start_date',
+                'after_or_equal:start_date',
+            ],
+        ]);
 
-        $query = Order::latest();
+        $startDate = $validated['start_date'] ?? null;
+        $endDate = $validated['end_date'] ?? null;
+
+        $query = Order::query()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                    ->orWhere('status', '!=', 'cancelled');
+            })
+            ->with('items')
+            ->latest();
 
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+            $query->whereBetween('created_at', [
+                Carbon::parse($startDate)->startOfDay(),
+                Carbon::parse($endDate)->endOfDay(),
+            ]);
         }
 
-        $orders = $query->get(); // Use get() instead of paginate for PDFs
+        $orders = $query->get();
+
         $totalSales = $orders->sum('total_amount');
 
-        // Load a specific PDF view (you can reuse the table HTML in a clean layout)
-        $pdf = Pdf::loadView('orders.pdf', compact('orders', 'startDate', 'endDate', 'totalSales'));
+        $pdf = Pdf::loadView('orders.pdf', [
+            'orders' => $orders,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'totalSales' => $totalSales,
+        ]);
 
-        return $pdf->download('orders-report-' . date('Y-m-d') . '.pdf');
+        return $pdf->download(
+            'smartwash-orders-report-' . now()->format('Y-m-d') . '.pdf'
+        );
     }
 }

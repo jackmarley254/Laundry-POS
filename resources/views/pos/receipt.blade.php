@@ -138,7 +138,7 @@
             
             <!-- Header -->
             <div class="header">
-                <h2>Laundry POS</h2>
+                <h2>SMARTWASH LAUNDRY</h2>
                 <div style="font-size: 11px; margin-top: 5px;">
                     P.O. Box 12345, Nairobi<br>
                     Tel: +254 700 000 000
@@ -215,7 +215,7 @@
             <!-- Footer -->
             <div class="footer">
                 <p style="margin: 0; font-weight: bold;">*** THANK YOU ***</p>
-                <p style="margin: 5px 0 0 0; font-size: 10px;">Powered by Laravel POS</p>
+                <p style="margin: 5px 0 0 0; font-size: 10px;">Powered by Skytech Consulting LTD</p>
             </div>
 
         </div>
