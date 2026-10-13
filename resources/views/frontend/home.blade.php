@@ -1354,14 +1354,15 @@
                 <div class="lg:col-span-3 info-card rounded-3xl p-6 sm:p-10">
                     <div class="mb-7"><h2 class="font-display text-3xl text-brand-900 mb-2">Send us a message</h2><p class="text-slate-500 text-sm">Fill in the details below. Required fields are marked.</p></div>
                     <form id="contactForm" class="space-y-5" onsubmit="submitContactForm(event)">
+                        @csrf
                         <div class="grid sm:grid-cols-2 gap-5">
                             <div><label for="contactName" class="block text-sm font-bold text-slate-700 mb-2">Your name *</label><input id="contactName" name="name" required maxlength="100" autocomplete="name" class="contact-field" placeholder="e.g. Jane Wanjiku"></div>
                             <div><label for="contactEmail" class="block text-sm font-bold text-slate-700 mb-2">Email address *</label><input id="contactEmail" name="email" type="email" required maxlength="150" autocomplete="email" class="contact-field" placeholder="you@example.com"></div>
                         </div>
                         <div><label for="contactSubject" class="block text-sm font-bold text-slate-700 mb-2">Subject *</label><input id="contactSubject" name="subject" required maxlength="150" class="contact-field" placeholder="How can we help?"></div>
                         <div><label for="contactMessage" class="block text-sm font-bold text-slate-700 mb-2">Message *</label><textarea id="contactMessage" name="message" required maxlength="3000" rows="5" class="contact-field resize-y" placeholder="Tell us a little more about your question..."></textarea><p class="text-xs text-slate-400 mt-2">Please do not include payment card details or passwords.</p></div>
-                        <button type="submit" class="glow-btn w-full sm:w-auto px-7 py-3.5 rounded-xl text-white font-extrabold inline-flex items-center justify-center gap-3">Prepare Message <i class="fas fa-paper-plane"></i></button>
-                        <p class="text-xs text-slate-400 leading-5">This frontend prepares an email in your device's default email application. To deliver messages directly from the website, connect this form to a Laravel contact endpoint.</p>
+                        <button type="submit" class="glow-btn w-full sm:w-auto px-7 py-3.5 rounded-xl text-white font-extrabold inline-flex items-center justify-center gap-3"><span>Send Message</span> <i class="fas fa-paper-plane" aria-hidden="true"></i></button>
+                        <p class="text-xs text-slate-400 leading-5">Your message will be submitted securely and saved for our team to review. We will use your email address to respond if needed.</p>
                     </form>
                 </div>
             </div>
@@ -2033,28 +2034,80 @@ function renderAllServices() {
         </article>`).join('');
 }
 
-function submitContactForm(event) {
+async function submitContactForm(event) {
     event.preventDefault();
+
     const form = event.currentTarget;
-    if (!form.reportValidity()) return;
-    const data = new FormData(form);
-    const name = String(data.get('name') || '').trim();
-    const email = String(data.get('email') || '').trim();
-    const subject = String(data.get('subject') || '').trim();
-    const message = String(data.get('message') || '').trim();
+    if (!form || !form.reportValidity()) return;
+
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) return;
+
+    const originalButtonHtml = button.innerHTML;
+    const formData = new FormData(form);
+
+    // Trim text values before sending them to Laravel.
+    ['name', 'email', 'subject', 'message'].forEach(field => {
+        formData.set(field, String(formData.get(field) || '').trim());
+    });
+
+    const name = String(formData.get('name') || '');
+    const email = String(formData.get('email') || '');
+    const subject = String(formData.get('subject') || '');
+    const message = String(formData.get('message') || '');
+
     if (!name || !email || !subject || !message) {
         showToast('Please complete all required fields.');
         return;
     }
-    const recipient = @json(config('mail.from.address'));
-    if (!recipient) {
-        showToast('The contact email is not configured yet. Please contact the business administrator.');
-        return;
+
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.innerHTML = '<span class="spinner" aria-hidden="true"></span><span>Sending message...</span>';
+
+    try {
+        const response = await fetch(@json(route('contact-messages.store')), {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: formData,
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            let errorMessage = data.message || 'Unable to send your message. Please try again.';
+
+            if (data.errors) {
+                const firstFieldErrors = Object.values(data.errors)[0];
+                if (Array.isArray(firstFieldErrors) && firstFieldErrors.length) {
+                    errorMessage = firstFieldErrors[0];
+                }
+            }
+
+            if (response.status === 419) {
+                errorMessage = 'Your session or security token has expired. Refresh the page and try again.';
+            } else if (response.status === 429) {
+                errorMessage = data.message || 'Too many attempts. Please wait a moment before trying again.';
+            }
+
+            throw new Error(errorMessage);
+        }
+
+        form.reset();
+        showToast(data.message || 'Thank you! Your message has been sent successfully.');
+
+    } catch (error) {
+        console.error('Contact form submission error:', error);
+        showToast(error.message || 'Something went wrong. Please try again.');
+    } finally {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        button.innerHTML = originalButtonHtml;
     }
-    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    const mailto = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    showToast('Opening your email application to send the message.');
 }
 
 

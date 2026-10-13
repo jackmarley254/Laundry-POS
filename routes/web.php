@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Http\Request;
@@ -11,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\OnlineCustomerController;
+use App\Http\Controllers\ContactMessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,10 +18,12 @@ use App\Http\Controllers\OnlineCustomerController;
 |--------------------------------------------------------------------------
 |
 | Public website and online ordering
+| Public contact form submission
 | Guest authentication
 | Combined dashboard
 | Walk-in POS order management
 | Online customer order management
+| Contact message administration
 | Sales reports and services
 |
 |--------------------------------------------------------------------------
@@ -32,13 +34,29 @@ use App\Http\Controllers\OnlineCustomerController;
 // PUBLIC ROUTES
 // ==========================================================================
 
+// Public homepage.
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
-// Public online laundry order submission.
+// --------------------------------------------------------------------------
+// PUBLIC ONLINE LAUNDRY ORDER SUBMISSION
+// --------------------------------------------------------------------------
+
 Route::post('/online-order', [OnlineCustomerController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('online-orders.store');
+
+// --------------------------------------------------------------------------
+// PUBLIC CONTACT FORM SUBMISSION
+// --------------------------------------------------------------------------
+//
+// Visitors can submit messages without logging in.
+// Messages are validated and stored in the database by the controller.
+//
+
+Route::post('/contact-messages', [ContactMessageController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('contact-messages.store');
 
 
 // ==========================================================================
@@ -64,7 +82,7 @@ Route::middleware('guest')->group(function () {
             $credentials,
             $request->boolean('remember')
         )) {
-            // Regenerate session ID after successful authentication.
+            // Regenerate the session ID after successful authentication.
             $request->session()->regenerate();
 
             return redirect()->intended(
@@ -77,7 +95,6 @@ Route::middleware('guest')->group(function () {
                 'email' => 'The email or password is incorrect.',
             ])
             ->onlyInput('email');
-
     })->name('login.process');
 
 });
@@ -104,14 +121,10 @@ Route::middleware('auth')->group(function () {
     // ----------------------------------------------------------------------
     // MAIN DASHBOARD
     // ----------------------------------------------------------------------
-    //
+
     // DashboardController aggregates data from:
     // 1. Walk-in POS orders (Order model)
     // 2. Online customer orders (OnlineOrder model)
-    //
-    // Create app/Http/Controllers/DashboardController.php before using
-    // this route.
-    //
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('pos.dashboard');
@@ -141,7 +154,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [POSController::class, 'orderList'])
         ->name('orders.index');
 
-    // Keep the download route before other order-specific routes.
+    // Keep the download route before parameterized order routes.
     Route::get('/orders/download', [POSController::class, 'downloadReport'])
         ->name('orders.download');
 
@@ -168,6 +181,48 @@ Route::middleware('auth')->group(function () {
         '/online-orders/{order}/payment-status',
         [OnlineCustomerController::class, 'updatePaymentStatus']
     )->name('online-orders.payment-status.update');
+
+
+    // ----------------------------------------------------------------------
+    // CONTACT MESSAGE ADMINISTRATION
+    // ----------------------------------------------------------------------
+    //
+    // These routes are protected by the auth middleware above.
+    // Only authenticated users can access the message inbox.
+    //
+    // IMPORTANT:
+    // ContactMessageController must implement the methods used below.
+    //
+
+    // Inbox: display all submitted contact messages.
+    Route::get('/contact-messages', [
+        ContactMessageController::class,
+        'index',
+    ])->name('contact-messages.index');
+
+    // View one message.
+    Route::get('/contact-messages/{contactMessage}', [
+        ContactMessageController::class,
+        'show',
+    ])->name('contact-messages.show');
+
+    // Mark a message as read.
+    Route::patch('/contact-messages/{contactMessage}/read', [
+        ContactMessageController::class,
+        'markAsRead',
+    ])->name('contact-messages.read');
+
+    // Mark a message as unread.
+    Route::patch('/contact-messages/{contactMessage}/unread', [
+        ContactMessageController::class,
+        'markAsUnread',
+    ])->name('contact-messages.unread');
+
+    // Delete a message.
+    Route::delete('/contact-messages/{contactMessage}', [
+        ContactMessageController::class,
+        'destroy',
+    ])->name('contact-messages.destroy');
 
 
     // ----------------------------------------------------------------------
@@ -207,3 +262,4 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 
 });
+
